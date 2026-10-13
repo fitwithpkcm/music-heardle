@@ -92,5 +92,10 @@ app.get('/leaderboard', async (req, res) => {
   res.json(rows)
 })
 
+app.get('/health', async (req, res) => {
+    res.json({ ok: true })
+});
+
+
 const port = process.env.PORT || 4000
 app.listen(port, () => console.log(`Leaderboard API on :${port}`))
