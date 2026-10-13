@@ -1,5 +1,9 @@
+import GameModes from './components/GameModes'
+import BuzzerGame from './components/BuzzerGame'
+import Admin from './components/Admin'
 import { useEffect, useState } from 'react'
 import ClueGame from './components/ClueGame'
+import LyricsGame from './components/LyricsGame'
 import DialogueGame from './components/DialogueGame'
 import GuessGame from './components/GuessGame'
 import Leaderboard from './components/Leaderboard'
@@ -41,9 +45,10 @@ function CinemaHome() {
             </div>
           </a>
           {[
+            { id: 'lyrics', number: '04', title: 'Missing Lyrics', category: 'THE LYRICS ROUND', topline: 'A MALAYALAM LYRICS CHALLENGE', headline: 'FILL THE SILENCE.', subtitle: 'Know the words.', symbol: '♫', description: 'Two lyric sections, a few missing words. Play aloud with a host or compete in a shared room with another team.', features: ['10 points per word', 'Host mode', 'Online teams'], footer: 'SAME WORDS. TWO TEAMS.' },
             { id: 'dialogue', number: '02', title: 'Guess the Movie', category: 'THE DIALOGUE ROUND', topline: 'A MALAYALAM DIALOGUE EXPERIENCE', headline: 'FAMOUS LINES.', subtitle: 'Unforgettable films.', symbol: '“', description: 'One familiar dialogue. Which Malayalam film comes to mind? Read the script and name the movie behind the words.', features: ['Iconic dialogues', 'Type your answer', 'Spelling friendly'], footer: 'ONE LINE. A THOUSAND MEMORIES.' },
             { id: 'clue', number: '03', title: 'Five Clues', category: 'THE MOVIE MYSTERY', topline: 'A MALAYALAM MOVIE MYSTERY', headline: 'FOLLOW THE CLUES.', subtitle: 'Name the film.', symbol: '05', description: 'One movie, five hints. Solve it early for more points, or reveal the answer after clue five.', features: ['5 clues', '100 points to win', 'Optional timer'], footer: 'FIVE CLUES. ONE GREAT REVEAL.' },
-          ].map(game => (
+          ].sort((a,b) => a.number.localeCompare(b.number)).map(game => (
             <a className={`featured-game featured-game-${game.id}`} href={`#${game.id}-game`} aria-label={`Play ${game.title}`} key={game.id}>
               <div className="game-poster">
                 <span className="poster-topline">{game.topline}</span>
@@ -62,8 +67,10 @@ function CinemaHome() {
               </div>
             </a>
           ))}
+
           <div className="coming-attractions"><span aria-hidden="true">✧</span><div><h3>More stories. More games.</h3><p>The next attraction is still in the making. Enjoy the music while you wait.</p></div><span className="coming-label">COMING SOON</span></div>
         </section>
+        <a className="admin-home-link" href="#admin">Admin ↗</a>
         <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><span>For the fans. For the fun.</span></footer>
       </div>
     </main>
@@ -71,29 +78,35 @@ function CinemaHome() {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
   const [scoreVersion, setScoreVersion] = useState(0)
   useEffect(() => {
     const updatePage = () => {
-      setPage(window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
       if (window.location.hash !== '#now-showing') window.scrollTo(0, 0)
     }
     window.addEventListener('hashchange', updatePage)
     return () => window.removeEventListener('hashchange', updatePage)
   }, [])
+  if (page === 'buzzer') return <BuzzerGame />
+  if (page === 'admin') return <Admin />
+  if (page === 'lyrics') return <LyricsGame />
   if (page === 'clue') return <ClueGame />
   if (page === 'dialogue') return <DialogueGame />
   if (page === 'home') return <CinemaHome />
   return (
     <main className="app">
       <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
+
       <header className="masthead">
         <p className="eyebrow">THE MALAYALAM MUSIC CLUB</p>
         <h1>A little nostalgia.<br /><em>A familiar tune.</em></h1>
         <p>Listen to a little. Remember it all.</p>
       </header>
+      <GameModes game="song" />
       <GuessGame onScoreSaved={() => setScoreVersion((value) => value + 1)} />
       <Leaderboard refreshKey={scoreVersion} />
     </main>
   )
 }
+

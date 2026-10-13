@@ -1,5 +1,8 @@
 import express from 'express'
 import clueGame from './clueGame.js'
+import lyricsGame from './lyricsGame.js'
+import admin from './admin.js'
+import buzzer from './buzzer.js'
 import cors from 'cors'
 import { pool } from './db.js'
 import { normalizeMovie, rankMovies, matchMovie } from './movieMatching.js'
@@ -7,7 +10,10 @@ import { normalizeMovie, rankMovies, matchMovie } from './movieMatching.js'
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.use('/admin', admin)
+app.use('/buzzer', buzzer)
 app.use('/clue-game', clueGame)
+app.use('/lyrics-game', lyricsGame)
 
 async function movieCatalog() {
   const [songs] = await pool.query('SELECT DISTINCT movie FROM songs')

@@ -142,7 +142,7 @@
 
 /* Newly mounted covers slide off once; countdown updates don't replay them. */
 .clue-list li { position: relative; overflow: hidden; isolation: isolate; }
-.clue-reveal-cover { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 20px; pointer-events: none; border: 1px solid #7c79584d; border-radius: 5px; background: repeating-linear-gradient(135deg, #c3ac7410 0 1px, transparent 1px 6px), linear-gradient(110deg, #3c4635, #303a2d); color: #d4ba84; box-shadow: 5px 0 15px #0005; font: 10px monospace; letter-spacing: 3px; transform-origin: right center; animation: clue-unveil 850ms cubic-bezier(.22,.7,.24,1) forwards; }
+.clue-reveal-cover { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 20px; pointer-events: none; border: 1px solid #7c79584d; border-radius: 5px; background: repeating-linear-gradient(135deg, #c3ac7410 0 1px, transparent 1px 6px), linear-gradient(110deg, #3c4635, #303a2d); color: #d4ba84; box-shadow: 5px 0 15px #0005; font: 10px monospace; letter-spacing: 3px; transform-origin: right center; animation: clue-unveil 3500ms cubic-bezier(.4,0,.2,1) forwards; }
 .clue-cover-seal { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #b69c6255; border-radius: 50%; font-size: 16px; letter-spacing: 0; }
 @keyframes clue-unveil { 0%, 12% { transform: translateX(0); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(103%); opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .clue-reveal-cover { display: none; animation: none; } }
@@ -203,3 +203,50 @@
   .clue-score strong { font-size: 18px; }
 }
 .clue-case { position: relative; }
+.lyrics-setup { display:grid;grid-template-columns:1fr 1fr;gap:18px; }
+.lyrics-page button { background:#d6b272;color:#29392e;border-color:#b39964;padding:9px 13px;font-size:12px; }
+.lyrics-page button:disabled { opacity:.45; }
+.lyrics-page input { min-width:0;background:#263226;color:#f3ead8;border:1px solid #8f805b;margin:0;padding:10px; }
+.lyrics-setup h2 { font:26px Georgia,serif; }.lyrics-setup p { font-size:13px;line-height:1.7;color:#b9c0ae; }
+.lyrics-setup form { display:flex;flex-wrap:wrap;gap:8px;margin-top:20px; }.lyrics-setup label { flex-basis:100%; }
+.lyrics-room-bar,.lyrics-controls { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:12px; }
+.lyrics-sheet { position:relative; }.lyrics-stanza { white-space:pre-wrap;font-size:clamp(15px,2vw,20px);line-height:2.3;margin:12px 0 22px;color:#efe4cd; }
+.lyrics-blank { display:inline-block;color:#e5bd75;border-bottom:1px solid #ab945f;padding:0 6px; }.lyrics-blank sup { font:9px monospace;margin-right:4px; }.lyrics-blank.settled { color:#b9d7a8; }
+.lyrics-answers { margin:20px 0; }.lyrics-word-row { display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #b399643d;font-size:12px; }.lyrics-word-row>strong { min-width:60px; }.lyrics-word-row form { display:flex;flex:1;gap:8px; }.lyrics-word-row input { flex:1;width:0;font-size:16px; }.lyrics-mark { display:flex;gap:8px;align-items:center; }.lyrics-controls { justify-content:flex-start;margin-bottom:20px; }
+@media(max-width:640px){.lyrics-setup{grid-template-columns:1fr}.lyrics-page .dialogue-heading{padding:22px 0}.lyrics-page .dialogue-heading h1{font-size:34px}.lyrics-word-row>strong{flex-basis:100%}.lyrics-mark{flex-wrap:wrap}}
+.featured-game-lyrics .game-poster { background: radial-gradient(circle at 10% 20%, #b89791, transparent 65%), #715b65; }
+.featured-game-lyrics .poster-title { font-size: clamp(25px, 3.5vw, 39px); right: 22px; letter-spacing: -1px; line-height: 1.15; }
+.featured-game-lyrics .poster-title em { display: inline-block; font-size: clamp(36px, 4.5vw, 55px); margin-top: 10px; }
+.lyrics-page .lyrics-reveal-word { display:inline-flex;align-items:baseline;gap:5px;padding:0 6px;background:#d6b27218;color:#e5bd75;border:1px dashed #ab945f;border-radius:4px;font:inherit;line-height:1.7;vertical-align:baseline; }
+.lyrics-reveal-word small { font:10px system-ui,sans-serif; }
+.lyrics-winner-prompt { position:sticky;bottom:12px;z-index:9;margin:16px 0;padding:18px;border:2px solid #d6b272;border-radius:10px;background:#29392e;box-shadow:0 8px 30px #0006; }
+.lyrics-winner-prompt h2 { margin:0;font:22px Georgia,serif;color:#f3ead8; }.lyrics-winner-prompt p { color:#e5c58c;line-height:1.7; }.lyrics-winner-prompt>div { display:flex;flex-wrap:wrap;gap:8px; }
+.clue-custom-timer { display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex-basis:100%;padding-top:6px; }
+.clue-custom-timer input { width:85px;min-width:0;margin:0;padding:7px 9px;background:#30392b;border:1px solid #726448;color:#eed6a7;font-size:16px; }
+.clue-custom-timer button { margin:0;padding:7px 12px;background:#d6b272;color:#29392e;font-size:12px; }
+.clue-custom-timer button:disabled { opacity:.5; }
+.clue-custom-timer > span { flex-basis:100%;font-size:10px;color:#9eaa90; }
+.admin-home-link { position:fixed;bottom:18px;right:18px;z-index:20;padding:10px 16px;border:1px solid #b3996477;border-radius:20px;background:#29392e;color:#e6c68a;text-decoration:none;font-size:12px;box-shadow:0 3px 12px #0003; }
+.admin-shell { max-width:1150px;margin:auto;padding-bottom:40px; }.admin-page h1 { font:38px Georgia,serif;margin:28px 0; }.admin-page h2 { font:22px Georgia,serif;margin:0 0 16px; }.admin-page button { background:#d6b272;color:#283529;border-color:#ad925d;font-size:12px; }.admin-page button:disabled { opacity:.5; }.admin-page input,.admin-page textarea { width:100%;min-width:0;background:#1b241e;color:#f3ead8;border:1px solid #716446;border-radius:5px;padding:10px;margin:6px 0 0;font:16px/1.6 inherit; }.admin-page textarea { resize:vertical;line-height:1.7;font-size:15px; }.admin-page label { display:block;font-size:12px;color:#d7c49d;margin-bottom:16px; }.admin-login { max-width:380px;padding:24px;background:#263026;border-radius:12px; }.admin-tabs { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px; }.admin-tabs [aria-pressed="true"] { background:#f5e5bf;outline:2px solid #ad925d; }.admin-workspace { display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr);gap:20px; }.admin-list,.admin-editor { min-width:0;padding:20px;border:1px solid #b3996444;border-radius:10px;background:#242c23; }.admin-list-head { display:flex;justify-content:space-between;align-items:center;gap:8px; }.admin-list-head h2 { margin:0; }.admin-list ul { list-style:none;padding:0;max-height:65vh;overflow:auto; }.admin-list li { display:flex;align-items:center;gap:8px;border-bottom:1px solid #b3996433;padding:7px 0; }.admin-page .admin-entry { flex:1;min-width:0;text-align:left;background:none;color:#ede0c4;border:0; }.admin-entry strong,.admin-entry small { display:block;overflow-wrap:anywhere; }.admin-entry small { color:#a8b09a;font-size:10px;margin-top:5px; }.admin-page .admin-entry[aria-pressed="true"] { background:#3b4834; }.admin-page .admin-delete { color:#e6af96;background:#432d24;border-color:#70523e; }.admin-editor p { color:#a8b09a;font-size:11px;line-height:1.6; }.admin-confirm { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:30;width:min(92vw,500px);padding:24px;border:2px solid #d6b272;background:#29392e;box-shadow:0 10px 50px #0009;border-radius:12px; }.admin-confirm button { margin-right:10px; }.admin-error,.admin-notice { position:sticky;bottom:5px;padding:14px;border-radius:5px;background:#432d24;color:#ffd5c5; }.admin-notice { background:#334d34;color:#daf0cf; }
+@media(max-width:700px){.admin-workspace{grid-template-columns:1fr}.admin-list ul{max-height:260px}.admin-page{padding-inline:14px}.admin-home-link{bottom:12px;right:12px}}
+
+.admin-page input,.admin-page textarea { font-family:inherit;font-size:16px;line-height:1.6; }
+.admin-page .admin-entry:hover { background:#3b4834;color:#fff2d6; }
+.buzzer-page label { display:block;margin:12px 0;width:100%; }
+.buzzer-page input,.buzzer-page select { display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:10px;font-size:16px;background:#263226;color:#f3ead8;border:1px solid #8f805b;border-radius:6px; }
+.buzzer-page .lyrics-setup form { display:block;margin:0; }
+.buzzer-scores { display:flex;flex-wrap:wrap;gap:12px;margin:20px 0; }
+.buzzer-scores>div { flex:1;min-width:130px;padding:16px;background:#29392e;border:1px solid #8f805b;border-radius:10px; }
+.buzzer-scores span,.buzzer-scores small { display:block;margin-top:8px; }
+.buzzer-scores .winning { outline:3px solid #e6bd71; }
+.buzzer-status { text-align:center;padding:20px 0; }
+.buzzer-page .team-buzzer { display:block;width:min(100%,320px);min-height:150px;margin:10px auto 25px;border-radius:80px;background:#b64732;color:white;border:5px solid #e4b876;font:bold 36px Georgia,serif;box-shadow:0 7px 0 #63382c;touch-action:manipulation; }
+.buzzer-page .team-buzzer:disabled { background:#4e5149;opacity:.65;box-shadow:none; }
+.buzzer-page .active-blank { outline:3px solid #f4c980; }
+.buzzer-answer { padding:16px;background:#374c32;color:#fff0c8;font-size:22px;overflow-wrap:anywhere; }
+.buzzer-controls { margin-top:20px; }.buzzer-controls .lyrics-controls { margin-top:16px; }
+.buzzer-page li { padding:10px 0;line-height:1.6; }
+.game-modes { display:flex;gap:6px;padding:6px;margin:0 0 22px;border:1px solid #a58b5d;border-radius:12px;background:#283429; }
+.game-modes a { flex:1;text-align:center;padding:12px 8px;border-radius:8px;color:#efdfbd;text-decoration:none;font:14px system-ui,sans-serif; }
+.game-modes a[aria-current="page"] { background:#e0c38d;color:#293528;font-weight:600; }
+.game-modes a:hover { box-shadow:inset 0 0 0 1px #d6b272; }

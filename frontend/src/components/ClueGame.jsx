@@ -1,9 +1,13 @@
+import GameModes from './GameModes'
 import { useEffect, useRef, useState } from 'react'
 import { clueGameRequest } from '../lib/api'
 import RoundFeedback, { useRoundFeedback } from './RoundFeedback'
 export default function ClueGame() {
   const { feedback, targetRef, showFeedback, clearFeedback } = useRoundFeedback()
   const [timerSeconds,setTimerSeconds]=useState(0)
+  const [timerChoice,setTimerChoice]=useState('0')
+  const [customSeconds,setCustomSeconds]=useState('25')
+  const validCustom = /^\d+$/.test(customSeconds) && Number(customSeconds)>=1 && Number(customSeconds)<=600
   const [remaining,setRemaining]=useState(0)
   const deadline=useRef(0)
   const autoIssued=useRef(false)
@@ -64,12 +68,20 @@ export default function ClueGame() {
   return <main className="cinema-home clue-page"><div className="dialogue-shell">
     <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 03</span></header>
     <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>
+ <GameModes game="clues" />
     <div className="clue-timer-settings">
       <label htmlFor="clue-timer">Timer per clue</label>
-      <select id="clue-timer" value={timerSeconds} disabled={busy} onChange={e=>setTimerSeconds(Number(e.target.value))}>
+      <select id="clue-timer" value={timerChoice} disabled={busy} onChange={e=>{setTimerChoice(e.target.value);setTimerSeconds(e.target.value==='custom'?0:Number(e.target.value))}}>
         <option value="0">Off · play at your pace</option>
         {[10,20,30,45,60].map(seconds=><option key={seconds} value={seconds}>{seconds} seconds</option>)}
+        <option value="custom">Custom time…</option>
       </select>
+      {timerChoice==='custom'&&<form className="clue-custom-timer" onSubmit={e=>{e.preventDefault();if(validCustom&&!busy)setTimerSeconds(Number(customSeconds))}}>
+        <label htmlFor="custom-clue-seconds">Seconds per clue</label>
+        <input id="custom-clue-seconds" type="number" inputMode="numeric" min="1" max="600" step="1" required value={customSeconds} disabled={busy} onChange={e=>setCustomSeconds(e.target.value)} aria-describedby="custom-timer-help" />
+        <button disabled={busy||!validCustom||timerSeconds===Number(customSeconds)}>Apply</button>
+        <span id="custom-timer-help">Enter 1–600 seconds.{timerSeconds>0?` Active: ${timerSeconds}s per clue.`:' Press Apply to start.'}</span>
+      </form>}
       <p>{timerSeconds?'Each new clue gets a fresh timer. Clue five expires into the answer.':'Turn on a timer to reveal clues automatically.'}</p>
     </div>
     {timerSeconds>0&&active&&!expired&&<div className={'clue-countdown'+(remaining<=5?' urgent':'')}>

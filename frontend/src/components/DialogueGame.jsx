@@ -1,3 +1,4 @@
+import GameModes from './GameModes'
 import { useEffect, useRef, useState } from 'react'
 import { fetchDialogues, guessDialogue } from '../lib/api'
 import RoundFeedback, { useRoundFeedback } from './RoundFeedback'
@@ -84,6 +85,7 @@ export default function DialogueGame() {
       <div className="dialogue-shell">
         <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 02</span></header>
         <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>One line.<br /><em>A whole movie.</em></h1><p>You remember the dialogue. Can you name the film?</p></div>
+ <GameModes game="dialogue" />
         <div className="script-page-stack" aria-busy={!!turningPage}>
         <section ref={targetRef} className="dialogue-screen" aria-label="Movie dialogue clue">
           <RoundFeedback feedback={feedback} />
