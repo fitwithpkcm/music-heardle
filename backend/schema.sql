@@ -33,3 +33,5 @@ CREATE TABLE IF NOT EXISTS movie_puzzles (
   aliases JSON NOT NULL,
   clues JSON NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS picture_puzzles (id INT AUTO_INCREMENT PRIMARY KEY, movie VARCHAR(255) NOT NULL, aliases JSON NOT NULL, image_url VARCHAR(600) NOT NULL, mobile_image_url VARCHAR(600) NULL);

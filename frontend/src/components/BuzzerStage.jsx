@@ -1,3 +1,5 @@
+import PictureStage from './PictureStage'
+import './PictureGame.css'
 import {useEffect,useRef,useState} from 'react'
 import Radio from './Radio'
 import YearTuner from './YearTuner'
@@ -10,6 +12,7 @@ export default function BuzzerStage({game,room,busy,act}){
  useEffect(()=>{player.current?.stop();setMessage('Press Tune to play the clip.')},[room?.round])
  useEffect(()=>{if(room?.phase==='answering'||room?.phase==='settled')player.current?.stop()},[room?.phase])
  const live=room&&room.phase!=='lobby'
+ if(game==='pictures')return <PictureStage image={live?room.content:null} mobileImage={room?.mobileImage} round={room?.round}/>
  if(game==='song')return <>
   <Radio yearTuner={<YearTuner disabled={!room||busy||!['lobby','settled'].includes(room.phase)} years={[0,1990,1995,2000,2005,2010,2015,2020,2025]} value={room?.afterYear||0} onChange={year=>{if(room&&!busy&&['lobby','settled'].includes(room.phase))act('year',{afterYear:year})}} />} onPlay={()=>player.current?.playSnippet(room.content,0,duration,volume)} ready={ready} disabled={!live||!ready||busy||room.phase==='answering'} seconds={duration} volume={volume} onVolumeChange={v=>{setVolume(v);player.current?.setVolume(v)}}
    tunerContent={<div className="buzzer-radio-display"><span className="cinema-eyebrow">TEAM MUSIC ROUND</span><p>{!live?'Invite your teams to start.':room.phase==='settled'?room.answer:message}</p><small>Listen, open the buzzer, then answer aloud.</small></div>}>

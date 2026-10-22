@@ -1,3 +1,4 @@
+import PictureGame from './components/PictureGame'
 import GameModes from './components/GameModes'
 import BuzzerGame from './components/BuzzerGame'
 import Admin from './components/Admin'
@@ -45,9 +46,10 @@ function CinemaHome() {
             </div>
           </a>
           {[
-            { id: 'lyrics', number: '04', title: 'Missing Lyrics', category: 'THE LYRICS ROUND', topline: 'A MALAYALAM LYRICS CHALLENGE', headline: 'FILL THE SILENCE.', subtitle: 'Know the words.', symbol: '♫', description: 'Two lyric sections, a few missing words. Play aloud with a host or compete in a shared room with another team.', features: ['10 points per word', 'Host mode', 'Online teams'], footer: 'SAME WORDS. TWO TEAMS.' },
-            { id: 'dialogue', number: '02', title: 'Guess the Movie', category: 'THE DIALOGUE ROUND', topline: 'A MALAYALAM DIALOGUE EXPERIENCE', headline: 'FAMOUS LINES.', subtitle: 'Unforgettable films.', symbol: '“', description: 'One familiar dialogue. Which Malayalam film comes to mind? Read the script and name the movie behind the words.', features: ['Iconic dialogues', 'Type your answer', 'Spelling friendly'], footer: 'ONE LINE. A THOUSAND MEMORIES.' },
-            { id: 'clue', number: '03', title: 'Five Clues', category: 'THE MOVIE MYSTERY', topline: 'A MALAYALAM MOVIE MYSTERY', headline: 'FOLLOW THE CLUES.', subtitle: 'Name the film.', symbol: '05', description: 'One movie, five hints. Solve it early for more points, or reveal the answer after clue five.', features: ['5 clues', '100 points to win', 'Optional timer'], footer: 'FIVE CLUES. ONE GREAT REVEAL.' },
+            { id: 'picture', number: '02', title: 'Picture Clues', category: 'THE PICTURE CLUE', topline: 'A VISUAL MOVIE MYSTERY', headline: 'LOOK CLOSER.', subtitle: 'Name the movie.', symbol: '▣', description: 'A picture holds the clues. Step into the theatre and discover the movie it suggests.', features: ['Visual clues', 'Normal play', 'Team buzzer'], footer: 'ONE PICTURE. ONE MOVIE.' },
+            { id: 'lyrics', number: '05', title: 'Missing Lyrics', category: 'THE LYRICS ROUND', topline: 'A MALAYALAM LYRICS CHALLENGE', headline: 'FILL THE SILENCE.', subtitle: 'Know the words.', symbol: '♫', description: 'Two lyric sections, a few missing words. Play aloud with a host or compete in a shared room with another team.', features: ['10 points per word', 'Host mode', 'Online teams'], footer: 'SAME WORDS. TWO TEAMS.' },
+            { id: 'dialogue', number: '03', title: 'Guess the Movie', category: 'THE DIALOGUE ROUND', topline: 'A MALAYALAM DIALOGUE EXPERIENCE', headline: 'FAMOUS LINES.', subtitle: 'Unforgettable films.', symbol: '“', description: 'One familiar dialogue. Which Malayalam film comes to mind? Read the script and name the movie behind the words.', features: ['Iconic dialogues', 'Type your answer', 'Spelling friendly'], footer: 'ONE LINE. A THOUSAND MEMORIES.' },
+            { id: 'clue', number: '04', title: 'Five Clues', category: 'THE MOVIE MYSTERY', topline: 'A MALAYALAM MOVIE MYSTERY', headline: 'FOLLOW THE CLUES.', subtitle: 'Name the film.', symbol: '05', description: 'One movie, five hints. Solve it early for more points, or reveal the answer after clue five.', features: ['5 clues', '100 points to win', 'Optional timer'], footer: 'FIVE CLUES. ONE GREAT REVEAL.' },
           ].sort((a,b) => a.number.localeCompare(b.number)).map(game => (
             <a className={`featured-game featured-game-${game.id}`} href={`#${game.id}-game`} aria-label={`Play ${game.title}`} key={game.id}>
               <div className="game-poster">
@@ -78,17 +80,18 @@ function CinemaHome() {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
   const [scoreVersion, setScoreVersion] = useState(0)
   useEffect(() => {
     const updatePage = () => {
-      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
       if (window.location.hash !== '#now-showing') window.scrollTo(0, 0)
     }
     window.addEventListener('hashchange', updatePage)
     return () => window.removeEventListener('hashchange', updatePage)
   }, [])
   if (page === 'buzzer') return <BuzzerGame />
+  if (page === 'pictures') return <PictureGame />
   if (page === 'admin') return <Admin />
   if (page === 'lyrics') return <LyricsGame />
   if (page === 'clue') return <ClueGame />

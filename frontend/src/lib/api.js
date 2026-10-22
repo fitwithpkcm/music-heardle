@@ -35,3 +35,11 @@ export async function clueGameRequest(action, body = {}, signal) {
   if (!response.ok) { const error = new Error(data.error || 'Please try again.'); error.expired = response.status === 410; throw error }
   return data
 }
+
+export async function fetchPictures(signal) {
+ const r=await fetch(BASE+'/picture-game',{signal});if(!r.ok)throw Error('Could not load picture clues.');return r.json()
+}
+export async function guessPicture(id,guess,reveal=false) {
+ const r=await fetch(BASE+'/picture-game/'+id+'/guess',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({guess,reveal})})
+ const data=await r.json();if(!r.ok)throw Error(data.error||'Could not check answer.');return data
+}

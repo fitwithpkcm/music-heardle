@@ -67,7 +67,7 @@ export default function ClueGame() {
     return ()=>clearInterval(interval)
   },[timerSeconds,active,expired,error,busy,round?.token,round?.clues.length])
   return <main className="cinema-home clue-page"><div className="dialogue-shell">
-    <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 03</span></header>
+    <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
     <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>
  <GameModes game="clues" />
     <div className="clue-timer-settings">

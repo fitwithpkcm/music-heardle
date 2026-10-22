@@ -2,7 +2,7 @@ import BuzzerStage from './BuzzerStage'
 import GameModes from './GameModes'
 import {useEffect,useRef,useState} from 'react'
 const BASE=import.meta.env.VITE_API_URL||`${location.protocol}//${location.hostname}:4000`
-const games={buzzer:'Standalone Buzzer',lyrics:'Missing Lyrics',dialogue:'Guess the Movie',clues:'Five Clues',song:'Guess the Song'}
+const games={pictures:'Picture Clues',buzzer:'Standalone Buzzer',lyrics:'Missing Lyrics',dialogue:'Guess the Movie',clues:'Five Clues',song:'Guess the Song'}
 export default function BuzzerGame(){
  const params=new URLSearchParams(location.hash.split('?')[1]||'')
  const [session,setSession]=useState(()=>{try{const s=JSON.parse(sessionStorage.getItem('buzzer-room'));return params.get('room')?(s?.code===params.get('room')?s:null):params.get('game')&&s?.game!==params.get('game')?null:s}catch{return null}})
@@ -30,10 +30,10 @@ export default function BuzzerGame(){
  const allBlocked=room&&room.blocked.length===room.teams.length
 
  const selected=room?.game||game
- const titles={lyrics:<>Know the words?<br/><em>Fill the silence.</em></>,dialogue:<>One line.<br/><em>A whole movie.</em></>,clues:<>Five clues.<br/><em>One movie.</em></>}
+ const titles={pictures:<>One picture.<br/><em>Which movie?</em></>,lyrics:<>Know the words?<br/><em>Fill the silence.</em></>,dialogue:<>One line.<br/><em>A whole movie.</em></>,clues:<>Five clues.<br/><em>One movie.</em></>}
  const phase=room?.phase
  const status=phase==='open'?'Buzzers open!':phase==='answering'?room.teams[room.winner.team].name+' buzzed first!':phase==='settled'?'Round settled':allBlocked?'All teams have tried.':'Buzzers closed'
- return <main className={selected==='song'?'app buzzer-page buzzer-integrated':'cinema-home lyrics-page buzzer-page buzzer-integrated '+(selected==='dialogue'?'dialogue-page':selected==='clues'?'clue-page':'')}><div className="dialogue-shell">
+ return <main className={selected==='song'?'app buzzer-page buzzer-integrated':(selected==='pictures'?'cinema-home picture-page buzzer-page buzzer-integrated ':'cinema-home lyrics-page buzzer-page buzzer-integrated ')+(selected==='dialogue'?'dialogue-page':selected==='clues'?'clue-page':'')}><div className="dialogue-shell">
  {selected==='song'?<a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>:<header className="dialogue-nav"><a href="#">← All games</a><span>{games[selected]} · Buzzer</span></header>}
  {selected!=='song'&&<div className="dialogue-heading"><p className="cinema-eyebrow">{games[selected]}</p><h1>{titles[selected]||'First to buzz.'}</h1></div>}
  {(!room||room.host)&&selected!=='buzzer'&&<GameModes game={selected} buzzer />}
