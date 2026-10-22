@@ -232,8 +232,8 @@
 
 .admin-page input,.admin-page textarea { font-family:inherit;font-size:16px;line-height:1.6; }
 .admin-page .admin-entry:hover { background:#3b4834;color:#fff2d6; }
-.buzzer-page label { display:block;margin:12px 0;width:100%; }
-.buzzer-page input,.buzzer-page select { display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:10px;font-size:16px;background:#263226;color:#f3ead8;border:1px solid #8f805b;border-radius:6px; }
+.buzzer-page label:not(.radio label) { display:block;margin:12px 0;width:100%; }
+.buzzer-page input:not(.radio input),.buzzer-page select { display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:10px;font-size:16px;background:#263226;color:#f3ead8;border:1px solid #8f805b;border-radius:6px; }
 .buzzer-page .lyrics-setup form { display:block;margin:0; }
 .buzzer-scores { display:flex;flex-wrap:wrap;gap:12px;margin:20px 0; }
 .buzzer-scores>div { flex:1;min-width:130px;padding:16px;background:#29392e;border:1px solid #8f805b;border-radius:10px; }
@@ -257,3 +257,72 @@
 .leaderboard .chart-toggle span:last-child { font-size:23px;line-height:1; }
 .leaderboard.leaderboard-collapsed { padding-block:18px; }
 .leaderboard #leaderboard-details:not([hidden]) { padding-top:24px; }
+
+/* Buzzer mode adds room controls around each game's original stage. */
+.buzzer-integrated .dialogue-shell { width:100%;box-sizing:border-box; }
+.buzzer-integrated.app > .dialogue-shell,
+.buzzer-integrated.app .buzzer-play-area { display:contents; }
+.buzzer-integrated.app .buzzer-winner-overlay { position:fixed;top:50%;transform:translate(-50%,-50%); }
+html { scrollbar-gutter:stable; }
+.buzzer-integrated.app .dialogue-nav { color:#765231; }
+.buzzer-integrated.app .dialogue-nav a { color:inherit; }
+.buzzer-setup-dialog { box-sizing:border-box;width:min(460px,calc(100% - 28px));max-height:85dvh;overflow:auto;padding:24px;border:1px solid #a58b5d;border-radius:16px;background:#222d25;color:#efe4cd;box-shadow:0 20px 80px #0008; }
+.buzzer-setup-dialog::backdrop { background:#101710aa; }
+.buzzer-room-dialog { width:min(620px,calc(100% - 28px)); }
+.buzzer-room-dialog>.lyrics-room-bar { margin-top:18px; }
+.buzzer-room-dialog .buzzer-lobby { margin-bottom:0; }
+.buzzer-room-dialog input[readonly] { font-size:12px; }
+.buzzer-dialog-heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
+.buzzer-dialog-heading h2 { margin:0;font:24px Georgia,serif; }
+.buzzer-setup-dialog button { padding:10px 14px;background:#dfc18a;color:#283429;border:1px solid #a58b5d;border-radius:8px;font-size:13px; }
+.buzzer-dialog-heading button { background:transparent;color:#efe4cd;font-size:24px;padding:2px 10px; }
+.buzzer-setup-tabs { display:flex;gap:8px;margin:22px 0 12px; }
+.buzzer-setup-tabs button { flex:1;background:transparent;color:#dfc18a; }
+.buzzer-setup-tabs button[aria-pressed="true"] { background:#dfc18a;color:#283429; }
+.buzzer-setup-fields { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px; }
+.buzzer-setup-dialog label { font-size:12px;line-height:1.5; }
+.buzzer-setup-dialog p { font-size:12px;line-height:1.6; }
+.buzzer-setup-launch,.buzzer-start { display:block;margin:16px auto; }
+.buzzer-integrated .compact-team-scores { flex-wrap:nowrap;overflow-x:auto;gap:8px;margin:12px 0; padding:3px; }
+.buzzer-integrated .compact-team-scores>div { min-width:85px;padding:8px 12px;color:#efe4cd;font-size:12px; }
+.compact-team-scores span { margin-top:4px;color:#e3be7e; }
+.compact-team-scores small { margin-top:4px;font-size:10px; }
+.buzzer-lobby { padding:10px 12px;margin:12px 0;border:1px solid #a58b5d66;border-radius:10px;font-size:12px; }
+.buzzer-lobby summary { cursor:pointer;line-height:1.6; }
+.buzzer-lobby summary>span { float:right;font-size:10px;opacity:.75; }
+.buzzer-lobby p { line-height:1.6; }
+.buzzer-lobby .lyrics-word-row select { width:auto;flex:1; }
+.buzzer-lobby .lyrics-controls { margin:12px 0 0; }
+.buzzer-play-area { position:relative;margin-top:16px; }
+.buzzer-winner-overlay { position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:30;box-sizing:border-box;width:min(94%,420px);padding:20px;border:2px solid #d6b272;border-radius:12px;background:#243329fa;color:#f3ead8;box-shadow:0 12px 40px #0008;text-align:center; }
+.buzzer-winner-overlay h2 { font:24px Georgia,serif;margin:0; }
+.buzzer-winner-overlay p { margin:12px 0;font-size:14px; }
+.buzzer-winner-overlay .lyrics-controls { justify-content:center;margin-bottom:12px; }
+.buzzer-winner-overlay button { background:#dfc18a;color:#283429;padding:10px 24px; }
+.buzzer-winner-overlay details { font-size:12px; }
+.buzzer-winner-overlay summary { cursor:pointer; }
+.buzzer-winner-overlay small { display:block;margin-top:10px;font-size:10px;opacity:.7; }
+.buzzer-host-bar { margin:16px 0;padding:12px;border:1px solid #a58b5d66;border-radius:10px;font-size:12px; }
+.buzzer-host-bar>p { margin:0 0 10px;line-height:1.5; }
+.buzzer-host-bar .lyrics-controls { gap:6px;margin:0; }
+.buzzer-host-bar button { padding:8px 12px;font-size:12px; }
+.buzzer-radio-display { text-align:center;color:#51391f;font-size:12px; }
+.buzzer-radio-display .cinema-eyebrow { font-size:8px; }
+.buzzer-radio-display p { margin:8px 0; }
+.buzzer-radio-display small { font-size:9px; }
+.buzzer-integrated .radio-volume { width:auto;margin:0; }
+.buzzer-integrated .radio-volume input { padding:0;margin:6px 0;width:100%;background:transparent;border:0; }
+.buzzer-integrated .radio .pill[aria-pressed="true"] { box-shadow:inset 0 2px 5px #38271977;outline:1px solid #cfa663; }
+.buzzer-player-screen { text-align:center;padding:20px 0; }
+.buzzer-player-screen h2 { font:28px Georgia,serif; }
+.buzzer-player-screen p { font-size:13px;line-height:1.6; }
+@media(max-width:480px) {
+ .buzzer-setup-dialog { padding:18px; }
+ .buzzer-setup-fields { grid-template-columns:1fr;gap:0; }
+ .buzzer-setup-fields label { margin:6px 0; }
+ .buzzer-winner-overlay { padding:14px; }
+ .buzzer-winner-overlay h2 { font-size:21px; }
+ .buzzer-lobby summary>span { float:none;display:block;margin-left:14px; }
+ .buzzer-radio-display { font-size:10px; }
+ .buzzer-radio-display small { font-size:8px; }
+}

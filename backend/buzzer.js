@@ -58,7 +58,7 @@ export function action(room,host,player,body,now=Date.now()){
 }
 async function catalog(game){
  if(game==='buzzer')return [{id:0}]
- const queries={lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+ const queries={lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id,release_year FROM songs'}
  if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
  const [rows]=await pool.query(queries[game]);if(!rows.length)fail('This catalog is empty.',503);return rows
 }
@@ -73,7 +73,7 @@ function view(room,host,player){
  expireAnswer(room)
  const answer=room.game==='lyrics'?room.content.flat().find(w=>w.id===room.active)?.text:room.answer
  const content=room.game==='lyrics'?room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null})):room.game==='clues'?room.content.slice(0,room.clue):room.game==='song'?(host?room.content:null):room.content
- return {code:room.code,host,game:room.game,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
+ return {code:room.code,host,game:room.game,afterYear:room.afterYear||0,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
 }
 const wrap=fn=>async(req,res)=>{try{await fn(req,res)}catch(e){res.status(e.status||503).json({error:e.status?e.message:'Room service unavailable.'})}}
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
@@ -104,7 +104,17 @@ router.use('/rooms/:code',(req,res,nextMiddleware)=>{
 router.get('/rooms/:code',(req,res)=>res.json(view(req.room,req.isBuzzerHost,req.player)))
 router.post('/rooms/:code/action',wrap(async(req,res)=>{
  const r=req.room
- if(req.body.action==='next'){
+ if(req.body.action==='year'){
+  if(!req.isBuzzerHost)fail('Host only.',403)
+  if(req.body.version!==r.version)fail('Room changed. Try again.')
+  if(r.game!=='song'||!['lobby','settled'].includes(r.phase))fail('Change the year before starting or after finishing a round.')
+  const year=req.body.afterYear
+  if(![0,1990,1995,2000,2005,2010,2015,2020,2025].includes(year))fail('Choose a year.',400)
+  const rows=await catalog('song'),filtered=year?rows.filter(row=>row.release_year>year):rows
+  if(req.body.version!==r.version)fail('Room changed. Try again.')
+  if(!filtered.length)fail('No songs after that year.')
+  const lobby=r.phase==='lobby';r.catalog=filtered;r.afterYear=year;r.index=-1;next(r);if(lobby){r.phase='lobby';r.round=1}r.version++
+ }else if(req.body.action==='next'){
   expireAnswer(r)
   if(!req.isBuzzerHost)fail('Host only.',403)
   if(req.body.version!==r.version)fail('Room changed. Try again.')

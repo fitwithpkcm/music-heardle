@@ -129,16 +129,6 @@ export default function GuessGame({ onScoreSaved }) {
     catch(e){setPlaybackStatus(e.message);setCatalogError(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
-  if (!songs.length) {
-    return (
-      <div className="card game">
-        <p role="status">{catalogError || 'Loading songs…'}</p>
-        {catalogError && <YearTuner years={YEAR_STATIONS} value={afterYear} onChange={tuneYear} />}
-        {catalogError && <button onClick={() => setCatalogRequest((value) => value + 1)}>Retry</button>}
-      </div>
-    )
-  }
-
   const nameSet = !!progress.playerName
 
   return (
@@ -147,7 +137,7 @@ export default function GuessGame({ onScoreSaved }) {
         feedback={status}
         roundId={song?.id}
         yearTuner={nameSet && <YearTuner years={YEAR_STATIONS} value={afterYear} onChange={tuneYear} />}
-        tunerContent={nameSet && !song ? <p className="radio-hint" role="status">No playable songs with a known release year after {afterYear}. Choose another year or All.</p> : nameSet && status === 'active' ? (
+        tunerContent={nameSet && !song ? <div className="radio-hint" role="status"><p>{catalogError || 'Loading songs…'}</p>{catalogError && <button onClick={() => setCatalogRequest(value => value + 1)}>Retry</button>}</div> : nameSet && status === 'active' ? (
           <>
               <p className="radio-hint" role="status">{playbackStatus}</p>
 
