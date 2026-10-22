@@ -140,6 +140,23 @@ set a private `ADMIN_PASSWORD`: production rejects the default `admin` password.
 Admin endpoints require authentication. Sessions expire after two hours and are
 cleared when the backend restarts; logging out revokes the current session.
 
+## Song answer privacy
+
+Guess the Song now uses `/song-game/queue` and opaque two-hour round tokens.
+Active rounds expose only the token, YouTube playback ID, and status. The server
+checks typed guesses and returns the title/movie only when that round ends.
+Autocomplete was removed because it required an answer catalog in the browser.
+The queue maintains up to five upcoming songs without their answer metadata.
+
+`GET /songs`, `GET /movies`, and direct `POST /scores` return 410. Admin catalog
+access still requires authentication. Song leaderboard entries are written once
+per correct round using server timing and the lowest difficulty weight played
+during that round. Displayed local visit totals remain a convenience, not an
+authenticated tournament score. YouTube IDs and video metadata remain inspectable;
+external song recognition, repeated new rounds, and automation are still possible.
+Deploy frontend and backend together. Restarting the backend expires active rounds.
+Run `node --test songGame.test.js` to verify answer privacy and score replay checks.
+
 ## Host + buzzer
 
 The home page also has a separate **Team Buzzer** card. It defaults to Standalone

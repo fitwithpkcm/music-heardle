@@ -2,29 +2,23 @@ import { useEffect, useRef, useState } from 'react'
 import Player from './Player'
 import Radio from './Radio'
 import YearTuner from './YearTuner'
-import { fillQueue } from '../lib/songQueue'
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../data/levels'
 import { getProgress, setProgress } from '../lib/storage'
-import { fetchSongs, submitScore } from '../lib/api'
+import { songRequest } from '../lib/api'
 
 const MAX_SNIPPET_SECONDS = Math.max(...DIFFICULTIES.map((d) => d.snippetSeconds))
 const YEAR_STATIONS = [0, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025]
-
-function pickSong(songs, excludeId) {
-  const pool = songs.filter((s) => s.id !== excludeId)
-  const list = pool.length ? pool : songs
-  return list[Math.floor(Math.random() * list.length)]
-}
 
 export default function GuessGame({ onScoreSaved }) {
   const [progress, setProgressState] = useState(getProgress)
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY)
   const [songs, setSongs] = useState([])
   const [afterYear, setAfterYear] = useState(0)
-  const eligibleSongs = songs.filter((item) => !afterYear || item.releaseYear > afterYear)
   const [song, setSong] = useState(null)
   const [catalogError, setCatalogError] = useState('')
   const [catalogRequest, setCatalogRequest] = useState(0)
+  const [busy, setBusy] = useState(false)
+  const requestLock = useRef(false)
   const [guess, setGuess] = useState('')
   const [status, setStatus] = useState('active') // active | correct | revealed
   const [lastTimeMs, setLastTimeMs] = useState(0)
@@ -36,7 +30,6 @@ export default function GuessGame({ onScoreSaved }) {
   const queueRef = useRef([])
   const unavailableRef = useRef(new Set())
   const playerRef = useRef(null)
-  const startedAtRef = useRef(null)
   const songRef = useRef(song)
   songRef.current = song
 
@@ -45,7 +38,7 @@ export default function GuessGame({ onScoreSaved }) {
   useEffect(() => {
     const controller = new AbortController()
     setCatalogError('')
-    fetchSongs(controller.signal)
+    songRequest('queue', {afterYear}, controller.signal)
       .then((catalog) => {
         if (controller.signal.aborted) return
         if (!catalog.length) {
@@ -53,15 +46,15 @@ export default function GuessGame({ onScoreSaved }) {
           return
         }
         setSongs(catalog)
-        const first = pickSong(catalog)
-        queueRef.current = fillQueue(catalog, [], first.id)
+        const [first,...queue] = catalog
+        queueRef.current = queue
         setSong(first)
       })
       .catch(() => {
         if (!controller.signal.aborted) setCatalogError('Could not load songs. Please try again.')
       })
     return () => controller.abort()
-  }, [catalogRequest])
+  }, [catalogRequest, afterYear])
 
   useEffect(() => {
     if (!playerReady || !song) return
@@ -69,75 +62,57 @@ export default function GuessGame({ onScoreSaved }) {
     if (upcoming) playerRef.current?.prepare(upcoming.youtubeId)
   }, [playerReady, song, status])
 
-  function takeNextSong() {
-    queueRef.current = fillQueue(eligibleSongs, queueRef.current, songRef.current?.id, unavailableRef.current)
-    const next = queueRef.current.shift()
-    if (!next) {
-      setPlaybackStatus('No playable songs remain. Reload to try again.')
-      return null
-    }
-    queueRef.current = fillQueue(eligibleSongs, queueRef.current, next.id, unavailableRef.current)
+  useEffect(() => {
+    if (!song || status !== 'active' || queueRef.current.length >= 5) return
+    const controller = new AbortController()
+    songRequest('queue', {afterYear, exclude:[song.id,...queueRef.current.map(s=>s.id),...unavailableRef.current]}, controller.signal)
+      .then(items => { if (!controller.signal.aborted) {
+        const used=new Set([song.youtubeId,...queueRef.current.map(s=>s.youtubeId)])
+        queueRef.current=[...queueRef.current,...items.filter(s=>!used.has(s.youtubeId))].slice(0,5)
+      } }).catch(() => {})
+    return () => controller.abort()
+  }, [song, status, afterYear])
+
+  async function takeNextSong() {
+    if (!queueRef.current.length) queueRef.current = await songRequest('queue', {afterYear,exclude:[songRef.current?.id,...unavailableRef.current]})
+    const next=queueRef.current.shift()
+    if (!next) throw new Error('No songs available for this year filter.')
     return next
   }
 
-  function playClip() {
-    if (startedAtRef.current == null) startedAtRef.current = Date.now()
-    setLoadError(false)
-    playerRef.current?.playSnippet(song.youtubeId, 0, difficulty.snippetSeconds, volume)
+  async function playClip() {
+    if(requestLock.current||!song)return
+    requestLock.current=true;setBusy(true)
+    try {const data=await songRequest(song.id+'/play',{weight:difficulty.weight});setLoadError(false);playerRef.current?.playSnippet(data.youtubeId,0,data.seconds,volume)}
+    catch(e){setPlaybackStatus(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
-  // A song that won't load (blocked embed, dead link, etc) would otherwise
-  // leave the player stuck forever — swap in a different song automatically
-  // instead of making the player stare at a dead Play button.
-  function handleUnplayable(videoId) {
-    if (status !== 'active' || songRef.current?.youtubeId !== videoId) return
-    playerRef.current?.stop()
+  async function handleUnplayable(videoId) {
+    if (status!=='active'||songRef.current?.youtubeId!==videoId||requestLock.current) return
     unavailableRef.current.add(songRef.current.id)
-    const next = takeNextSong()
-    if (!next) return
-    setSong(next)
-    setGuess('')
-    startedAtRef.current = null
-    setLoadError(true)
-    setPlaybackStatus('Clip unavailable. Press Tune to try the next song.')
+    await nextRound()
+    setLoadError(true);setPlaybackStatus('Clip unavailable. Press Tune to try the next song.')
   }
 
-  function checkGuess(value) {
-    if (status !== 'active' || !value.trim()) return
-    if (value.trim().toLowerCase() !== song.title.trim().toLowerCase()) {
-      playerRef.current?.stop()
-      setStatus('wrong')
-      return
-    }
-    const timeMs = Date.now() - (startedAtRef.current ?? Date.now())
-    playerRef.current?.stop()
-    setLastTimeMs(timeMs)
-    setStatus('correct')
-    const nextScore = progress.score + difficulty.weight * 20
-    setProgressState({ ...progress, score: nextScore })
-    if (progress.playerName) {
-      submitScore({ playerName: progress.playerName, level: difficulty.weight, timeMs }).then(() => onScoreSaved?.()).catch(() => {})
-    }
+  async function finishRound(action,value) {
+    if(status!=='active'||requestLock.current)return
+    requestLock.current=true;setBusy(true)
+    try {
+      const data=await songRequest(song.id+'/'+action,{guess:value,playerName:progress.playerName})
+      playerRef.current?.stop();setSong(data);setStatus(data.status);setLastTimeMs(data.timeMs)
+      if(data.status==='correct'){setProgressState(p=>({...p,score:p.score+data.points}));if(data.scoreSaved)onScoreSaved?.()}
+    }catch(e){setPlaybackStatus(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
+  function checkGuess(value){if(value.trim())finishRound('guess',value)}
 
   function handleGuessChange(e) {
     setGuess(e.target.value)
   }
 
   function tuneYear(year) {
-    setFullSongId(null)
-    playerRef.current?.stop()
-    setAfterYear(year)
-    const pool = songs.filter((item) => (!year || item.releaseYear > year) && !unavailableRef.current.has(item.id))
-    const next = pool.length ? pickSong(pool, song?.id) : null
-    queueRef.current = next ? fillQueue(pool, [], next.id, unavailableRef.current) : []
-    setSong(next)
-    setGuess('')
-    setStatus('active')
-    setLoadError(false)
-    setPlaybackStatus('Press Tune to play the clip.')
-    startedAtRef.current = null
-    setDifficulty(DIFFICULTIES[0])
+    if(requestLock.current || year === afterYear)return
+    playerRef.current?.stop();setFullSongId(null);setAfterYear(year);setSongs([]);setSong(null);queueRef.current=[]
+    setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])
   }
 
   function handleSubmit(e) {
@@ -145,31 +120,20 @@ export default function GuessGame({ onScoreSaved }) {
     checkGuess(guess)
   }
 
-  function giveUp() {
-    if (status !== 'active') return
-    playerRef.current?.stop()
-    setStatus('revealed')
-    setDifficulty(DIFFICULTIES[0]) // always back to Impossible for the next song
-  }
+  function giveUp(){finishRound('reveal')}
 
-  function nextRound() {
-    setFullSongId(null)
-    playerRef.current?.stop()
-    setLoadError(false)
-    setPlaybackStatus('Press Tune to play the clip.')
-    const next = takeNextSong()
-    if (!next) return
-    setSong(next)
-    setGuess('')
-    setStatus('active')
-    startedAtRef.current = null
-    setDifficulty(DIFFICULTIES[0]) // always back to Impossible for the next song
+  async function nextRound() {
+    if(requestLock.current)return
+    requestLock.current=true;setBusy(true);setFullSongId(null);playerRef.current?.stop()
+    try{const next=await takeNextSong();setSong(next);setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])}
+    catch(e){setPlaybackStatus(e.message);setCatalogError(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
   if (!songs.length) {
     return (
       <div className="card game">
         <p role="status">{catalogError || 'Loading songs…'}</p>
+        {catalogError && <YearTuner years={YEAR_STATIONS} value={afterYear} onChange={tuneYear} />}
         {catalogError && <button onClick={() => setCatalogRequest((value) => value + 1)}>Retry</button>}
       </div>
     )
@@ -196,14 +160,7 @@ export default function GuessGame({ onScoreSaved }) {
                   onChange={handleGuessChange}
                   placeholder="Guess song..."
                 />
-                {guess.trim().length >= 2 && (
-                  <div className="song-suggestions" aria-label="Matching songs">
-                    {eligibleSongs.filter((item) => item.title.toLowerCase().includes(guess.trim().toLowerCase())).slice(0, 5).map((item) => (
-                      <button type="button" key={item.id} onClick={() => { setGuess(item.title); checkGuess(item.title) }}>{item.title}</button>
-                    ))}
-                  </div>
-                )}
-                <div className="radio-guess-actions"><button type="submit" disabled={!guess.trim()}>Guess</button><button type="button" onClick={giveUp}>Give up</button></div>
+                <div className="radio-guess-actions"><button type="submit" disabled={busy||!guess.trim()}>Guess</button><button type="button" disabled={busy} onClick={giveUp}>Give up</button></div>
               </form>
           </>
         ) : nameSet ? (
@@ -221,12 +178,12 @@ export default function GuessGame({ onScoreSaved }) {
             {status === 'correct' && <span className="radio-result-time">Guessed in {(lastTimeMs / 1000).toFixed(1)}s</span>}
             <div className="radio-reveal-actions">
               <button aria-expanded={fullSongId === song.youtubeId} aria-controls="revealed-song-player" onClick={() => { playerRef.current?.stop(); setFullSongId(fullSongId === song.youtubeId ? null : song.youtubeId) }}>{fullSongId === song.youtubeId ? 'Stop song' : '▶ Play song'}</button>
-              <button onClick={nextRound}>Next song ▶</button>
+              <button disabled={busy} onClick={nextRound}>Next song ▶</button>
             </div>
           </div>
         ) : null}
         onPlay={playClip}
-        disabled={!song || !playerReady || !nameSet || status !== 'active'}
+        disabled={busy || !song || !playerReady || !nameSet || status !== 'active'}
         ready={playerReady}
         seconds={difficulty.snippetSeconds}
         volume={volume}
@@ -247,6 +204,7 @@ export default function GuessGame({ onScoreSaved }) {
                   '--pill-color': d.color,
                   opacity: difficulty.name === d.name ? 1 : 0.55,
                 }}
+                disabled={busy}
                 onClick={() => setDifficulty(d)}
               >
                 {d.name}

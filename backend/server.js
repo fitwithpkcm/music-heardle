@@ -1,3 +1,4 @@
+import songGame from './songGame.js'
 import express from 'express'
 import clueGame from './clueGame.js'
 import lyricsGame from './lyricsGame.js'
@@ -5,11 +6,12 @@ import admin from './admin.js'
 import buzzer from './buzzer.js'
 import cors from 'cors'
 import { pool } from './db.js'
-import { normalizeMovie, rankMovies, matchMovie } from './movieMatching.js'
+import { normalizeMovie, matchMovie } from './movieMatching.js'
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.use('/song-game', songGame)
 app.use('/admin', admin)
 app.use('/buzzer', buzzer)
 app.use('/clue-game', clueGame)
@@ -22,16 +24,7 @@ async function movieCatalog() {
   for (const row of dialogues) merged.set(normalizeMovie(row.movie), { movie: row.movie, aliases: typeof row.aliases === 'string' ? JSON.parse(row.aliases) : row.aliases })
   return [...merged.values()]
 }
-app.get('/movies', async (req, res) => {
-  const query = typeof req.query.q === 'string' ? req.query.q.trim() : ''
-  if (query.length < 2 || query.length > 100) return res.json([])
-  try {
-    const normalized = normalizeMovie(query)
-    const ranked = rankMovies(query, await movieCatalog())
-    const matches = ranked.filter(row => [row.movie, ...row.aliases].some(name => normalizeMovie(name).includes(normalized)) || row.distance <= (normalized.length >= 10 ? 2 : 1))
-    res.json(matches.slice(0, 6).map(row => row.movie))
-  } catch (error) { res.status(503).json({ error: 'Movie suggestions unavailable' }) }
-})
+app.get('/movies', (req,res) => res.status(410).json({error:'Public catalog disabled.'}))
 
 app.get('/dialogues', async (req, res) => {
   try {
@@ -61,27 +54,8 @@ app.post('/dialogues/:id/guess', async (req, res) => {
   }
 })
 
-app.get('/songs', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT id, title, movie, youtube_id AS youtubeId, release_year AS releaseYear FROM songs ORDER BY id')
-    res.set('Cache-Control', 'no-store').json(rows)
-  } catch (error) {
-    console.error('Could not load songs:', error.message)
-    res.status(503).json({ error: 'Song catalog unavailable' })
-  }
-})
-
-app.post('/scores', async (req, res) => {
-  const { playerName, level, timeMs } = req.body || {}
-  if (!playerName || !Number.isInteger(level) || !Number.isInteger(timeMs)) {
-    return res.status(400).json({ error: 'playerName, level, timeMs required' })
-  }
-  await pool.query(
-    'INSERT INTO scores (player_name, level, time_ms) VALUES (?, ?, ?)',
-    [String(playerName).slice(0, 24), level, timeMs]
-  )
-  res.status(201).json({ ok: true })
-})
+app.get('/songs', (req,res) => res.status(410).json({error:'Use song-game rounds.'}))
+app.post('/scores', (req,res) => res.status(410).json({error:'Scores are saved by song-game rounds.'}))
 
 app.get('/leaderboard', async (req, res) => {
   const level = Number(req.query.level) || 1

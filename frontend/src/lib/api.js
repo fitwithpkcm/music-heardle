@@ -1,19 +1,8 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const BASE = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:4000`
 
-export async function fetchSongs(signal) {
-  const res = await fetch(`${BASE}/songs`, { signal, cache: 'no-store' })
-  if (!res.ok) throw new Error('Failed to load songs')
-  return res.json()
-}
-
-export async function submitScore({ playerName, level, timeMs }) {
-  const res = await fetch(`${BASE}/scores`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerName, level, timeMs }),
-  })
-  if (!res.ok) throw new Error('Failed to submit score')
-  return res.json()
+export async function songRequest(path, body={}, signal) {
+ const res=await fetch(BASE+'/song-game/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal,cache:'no-store'});
+ const data=await res.json();if(!res.ok)throw new Error(data.error||'Song request failed');return data
 }
 
 export async function fetchLeaderboard(level) {
