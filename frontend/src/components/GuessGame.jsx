@@ -32,6 +32,7 @@ export default function GuessGame({ onScoreSaved }) {
   const [volume, setVolume] = useState(70)
   const [playerReady, setPlayerReady] = useState(false)
   const [loadError, setLoadError] = useState(false)
+  const [fullSongId, setFullSongId] = useState(null)
   const queueRef = useRef([])
   const unavailableRef = useRef(new Set())
   const playerRef = useRef(null)
@@ -124,6 +125,7 @@ export default function GuessGame({ onScoreSaved }) {
   }
 
   function tuneYear(year) {
+    setFullSongId(null)
     playerRef.current?.stop()
     setAfterYear(year)
     const pool = songs.filter((item) => (!year || item.releaseYear > year) && !unavailableRef.current.has(item.id))
@@ -151,6 +153,8 @@ export default function GuessGame({ onScoreSaved }) {
   }
 
   function nextRound() {
+    setFullSongId(null)
+    playerRef.current?.stop()
     setLoadError(false)
     setPlaybackStatus('Press Tune to play the clip.')
     const next = takeNextSong()
@@ -213,9 +217,12 @@ export default function GuessGame({ onScoreSaved }) {
             />
             <span className={`radio-result-label ${status === 'wrong' ? 'radio-result-wrong' : ''}`}>{status === 'correct' ? '🎉 Correct!' : status === 'wrong' ? 'Wrong song. The answer is:' : 'The answer'}</span>
             <strong>{song.title}</strong>
-            <span className="radio-result-movie">{song.movie}</span>
+            <span className="radio-result-movie">Movie: {song.movie}</span>
             {status === 'correct' && <span className="radio-result-time">Guessed in {(lastTimeMs / 1000).toFixed(1)}s</span>}
-            <button onClick={nextRound}>Next song ▶</button>
+            <div className="radio-reveal-actions">
+              <button aria-expanded={fullSongId === song.youtubeId} aria-controls="revealed-song-player" onClick={() => { playerRef.current?.stop(); setFullSongId(fullSongId === song.youtubeId ? null : song.youtubeId) }}>{fullSongId === song.youtubeId ? 'Stop song' : '▶ Play song'}</button>
+              <button onClick={nextRound}>Next song ▶</button>
+            </div>
           </div>
         ) : null}
         onPlay={playClip}
@@ -272,6 +279,12 @@ export default function GuessGame({ onScoreSaved }) {
           </div>
         )}
       </Radio>
+    {song && status !== 'active' && fullSongId === song.youtubeId && <section className="card revealed-song-player" id="revealed-song-player" aria-label="Revealed song playback">
+      <h2>{song.title}</h2>
+      <p>Movie: {song.movie}</p>
+      <iframe key={song.youtubeId} title={`Play ${song.title}`} src={`https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&playsinline=1`} allow="autoplay; encrypted-media; fullscreen" allowFullScreen />
+      <p><a href={`https://www.youtube.com/watch?v=${song.youtubeId}`} target="_blank" rel="noopener noreferrer">Open song on YouTube ↗</a></p>
+    </section>}
     <Player onPlaybackStatus={setPlaybackStatus} ref={playerRef} onReady={() => setPlayerReady(true)} onUnplayable={handleUnplayable} />
     {!nameSet && <div className="card game">
 

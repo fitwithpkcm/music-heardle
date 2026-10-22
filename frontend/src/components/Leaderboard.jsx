@@ -8,8 +8,10 @@ export default function Leaderboard({ refreshKey = 0 }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [retry, setRetry] = useState(0)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
+    if (!expanded) return
     let cancelled = false
     setError('')
     setLoading(true)
@@ -18,10 +20,14 @@ export default function Leaderboard({ refreshKey = 0 }) {
       .catch(() => { if (!cancelled) setError('The chart is unavailable right now.') })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [difficulty, refreshKey, retry])
+  }, [difficulty, refreshKey, retry, expanded])
 
   return (
-    <section className="card leaderboard" aria-labelledby="leaderboard-title">
+    <section className={`card leaderboard ${expanded ? '' : 'leaderboard-collapsed'}`} aria-label="Leaderboard">
+      <button className="chart-toggle" aria-expanded={expanded} aria-controls="leaderboard-details" onClick={() => setExpanded(value => !value)}>
+        <span>Leaderboard</span><span aria-hidden="true">{expanded ? '−' : '+'}</span>
+      </button>
+      <div id="leaderboard-details" hidden={!expanded}>
       <div className="chart-heading">
         <div>
           <p className="chart-eyebrow">THE LISTENERS’ CHART</p>
@@ -53,6 +59,7 @@ export default function Leaderboard({ refreshKey = 0 }) {
           </ol>}
       </div>
       <p className="chart-footer">{difficulty.snippetSeconds}-second clips <span>·</span> Ranked by fastest guess</p>
+      </div>
     </section>
   )
 }

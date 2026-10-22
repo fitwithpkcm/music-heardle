@@ -98,11 +98,6 @@ export default function App() {
     <main className="app">
       <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
 
-      <header className="masthead">
-        <p className="eyebrow">THE MALAYALAM MUSIC CLUB</p>
-        <h1>A little nostalgia.<br /><em>A familiar tune.</em></h1>
-        <p>Listen to a little. Remember it all.</p>
-      </header>
       <GameModes game="song" />
       <GuessGame onScoreSaved={() => setScoreVersion((value) => value + 1)} />
       <Leaderboard refreshKey={scoreVersion} />
