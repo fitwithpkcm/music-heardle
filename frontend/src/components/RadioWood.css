@@ -1,0 +1,72 @@
+/* Polished walnut cabinet with a woven grille and brass detailing. */
+.app:has(.wood-radio) { max-width:720px; }
+.radio.wood-radio {
+  width:100%;max-width:640px;margin:20px auto 24px;padding:30px 32px 26px;
+  border:2px solid #592a16;border-radius:17px 19px 20px 20px;
+  background:
+    repeating-linear-gradient(3deg,transparent 0 3px,#e5a56a18 4px,transparent 5px 9px,#1c0a071a 10px,transparent 11px 17px),
+    repeating-linear-gradient(176deg,#a7633012 0 2px,transparent 3px 29px),
+    linear-gradient(90deg,#58200e,#a65a2c 3%,#77351b 10%,#652814 45%,#8e4825 88%,#b5703a 97%,#50200e);
+  box-shadow:inset 0 5px 3px #efc9a38c,inset 0 -7px 5px #2a100caa,inset 5px 0 6px #d3905670,inset -5px 0 7px #2c110c77,0 18px 25px -14px #30150db0;
+}
+.wood-radio::before,.wood-radio::after { content:'';position:absolute;left:-3px;right:-3px;height:9px;pointer-events:none;border-radius:7px;background:linear-gradient(#3b2f19,#fff3b5 18%,#af8b48 36%,#eee2a3 48%,#51411f 68%,#1d180e);box-shadow:0 2px 3px #200d08; }
+.wood-radio::before { top:13px; }.wood-radio::after { bottom:10px; }
+.wood-radio .radio-grille,.wood-radio .radio-grille:has(.radio-year-tuner) {
+  height:222px;border:7px solid #492010;border-bottom-width:11px;border-radius:38px 38px 5px 5px;
+  background-color:#181714;
+  background-image:radial-gradient(ellipse at center,#c09263 0 17%,#614731 23% 37%,transparent 47%),radial-gradient(ellipse at center,#b18c62 0 16%,#513b2d 24% 38%,transparent 49%);
+  background-size:9px 13px;background-position:0 0,4.5px 6.5px;
+  box-shadow:inset 0 7px 14px #000c,0 2px 0 #c58e56,0 7px 0 #211309,0 9px 0 #d2b875;
+}
+.wood-radio .radio-grille::after { background:linear-gradient(90deg,#0005,transparent 20% 80%,#0005);box-shadow:inset 0 0 13px #0008; }
+.wood-radio .radio-speaker { display:none; }
+.wood-radio .radio-brand,.wood-radio:has(.radio-game-panel) .radio-brand { right:18px;bottom:8px;font-size:17px;letter-spacing:1px;color:#dfc185;transform:none; }
+.wood-radio .radio-grille > .radio-year-tuner { margin:13px 13px 0;padding:6px 9px;border:1px solid #b69250;border-radius:5px;background:linear-gradient(#2e241b,#151512);box-shadow:0 3px 7px #0008; }
+.wood-radio .year-dial-glass { background:linear-gradient(#a87d32,#dfbd6e 48%,#bd944a);border-color:#4c391c;border-radius:2px;box-shadow:inset 0 2px 7px #50371e88; }
+.wood-radio .year-dial-heading,.wood-radio .year-dial-caption,.wood-radio .radio-year-stations button { color:#302515; }
+.wood-radio .year-knob-control { color:#d9c69f; }
+.wood-radio .radio-game-panel,.wood-radio .radio-grille:has(.radio-year-tuner) .radio-game-panel { margin:9px 13px 0;padding:8px 10px;border:1px solid #a88651;border-radius:4px;background:linear-gradient(#30271deb,#1c1a16f5);box-shadow:0 3px 6px #0008; }
+.wood-radio .radio-game-panel .pill { background:linear-gradient(#f6ead1,#d5bf99);color:#39291b;border:1px solid #a68b5f;border-radius:3px;box-shadow:0 3px 0 #756041;padding:7px 3px;font-size:11px; }
+.wood-radio .radio-game-panel .pill[aria-pressed='true'] { background:linear-gradient(#b78c49,#efce8d);box-shadow:inset 0 2px 4px #60401e; }
+.wood-radio .radio-game-panel .pill::before { margin-bottom:4px; }
+.wood-radio .radio-game-panel .progress-track { margin:10px 0;background:#594832; }
+.wood-radio .radio-game-panel .score-row { color:#e8d1a1;font-size:11px; }
+.wood-radio .radio-console,.wood-radio .radio-console:has(.radio-tuner-search) {
+  display:grid;grid-template-columns:66px minmax(0,1fr) 66px;gap:16px;align-items:center;padding:17px 12px 12px;margin-top:14px;
+  border:2px solid #422716;border-top:4px ridge #c4a56a;border-radius:2px 2px 24px 24px;
+  background:repeating-linear-gradient(0deg,transparent 0 22px,#aa8a4e77 23px,transparent 25px),linear-gradient(#1d1813,#0e100f);
+  box-shadow:inset 0 5px 8px #000b,0 2px 1px #c4854c;
+}
+.wood-radio .radio-console > .radio-control { grid-column:1;grid-row:1; }
+.wood-radio .radio-console > .radio-tuner { grid-column:2;grid-row:1; }
+.wood-radio .radio-console > .radio-volume { grid-column:3;grid-row:1; }
+.wood-radio .radio-knob,.wood-radio .radio-play:hover:not(:disabled) {
+  width:62px;height:62px;border:3px solid #ccb17d;color:#58402a;
+  background:radial-gradient(circle,#ecddc4 0 48%,#c1a27c 50%,#f7e9cc 55%,#483528 57% 63%,#ba9153 65%,#f4dfaa 70%,#483021 74%);
+  box-shadow:0 4px 6px #0009,inset 0 1px 3px #fff7df;
+}
+.wood-radio .radio-control > span { color:#d3bb8e;font-size:8px;letter-spacing:.8px; }
+.wood-radio .radio-volume,.wood-radio .radio-volume input { width:62px; }
+.wood-radio .radio-volume b { left:27px;background:#86663f; }
+.wood-radio .radio-tuner-search { height:144px;min-height:144px;max-height:144px;border:2px solid #846237;border-radius:3px;background:linear-gradient(#cfb574,#f1dfaa 55%,#d8bd7f);box-shadow:inset 0 2px 6px #684c2588;padding:9px; }
+.wood-radio .radio-tuner-search input { background:#fff8e4;border-color:#b69b65; }
+.wood-radio .radio-tuner-search button { background:#f2e4c9;border-color:#b99b6b;color:#49331e; }
+.wood-radio .radio-round-result { max-height:122px; }
+.wood-radio .radio-result-movie,.wood-radio .radio-tuner-search .radio-hint { color:#655034; }
+@media(max-width:480px) {
+ .radio.wood-radio { padding:25px 13px 23px;border-radius:12px; }
+ .wood-radio .radio-grille,.wood-radio .radio-grille:has(.radio-year-tuner) { height:176px;border-width:4px;border-radius:24px 24px 3px 3px; }
+ .wood-radio .radio-grille > .radio-year-tuner { margin:7px 6px 0;padding:4px; }
+ .wood-radio .radio-game-panel,.wood-radio .radio-grille:has(.radio-year-tuner) .radio-game-panel { margin:6px 6px 0;padding:6px; }
+ .wood-radio .radio-game-panel .pill { font-size:9px;padding:6px 1px; }
+ .wood-radio .radio-game-panel .progress-track { margin:7px 0; }
+ .wood-radio .radio-game-panel .score-row { font-size:10px; }
+ .wood-radio:has(.radio-game-panel) .radio-brand { font-size:12px;bottom:4px; }
+ .wood-radio .radio-console,.wood-radio .radio-console:has(.radio-tuner-search) { grid-template-columns:37px minmax(0,1fr) 37px;gap:7px;padding:10px 6px 8px;margin-top:10px;border-radius:2px 2px 16px 16px; }
+ .wood-radio .radio-knob,.wood-radio .radio-play:hover:not(:disabled) { width:37px;height:37px;border-width:2px;font-size:13px; }
+ .wood-radio .radio-volume,.wood-radio .radio-volume input { width:37px; }
+ .wood-radio .radio-volume b { left:15px;top:4px;height:6px; }
+ .wood-radio .radio-control > span { font-size:6px;letter-spacing:0; }
+ .wood-radio .radio-tuner-search { height:124px;min-height:124px;max-height:124px;padding:6px; }
+ .wood-radio .radio-round-result { max-height:108px; }
+}
