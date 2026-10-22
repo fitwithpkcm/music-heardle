@@ -122,10 +122,10 @@ export default function GuessGame({ onScoreSaved }) {
 
   function giveUp(){finishRound('reveal')}
 
-  async function nextRound() {
+  async function nextRound(skip = false) {
     if(requestLock.current)return
     requestLock.current=true;setBusy(true);setFullSongId(null);playerRef.current?.stop()
-    try{const next=await takeNextSong();setSong(next);setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])}
+    try{if(skip)await songRequest(song.id+'/skip');const next=await takeNextSong();setSong(next);setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])}
     catch(e){setPlaybackStatus(e.message);setCatalogError(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
@@ -160,7 +160,7 @@ export default function GuessGame({ onScoreSaved }) {
                   onChange={handleGuessChange}
                   placeholder="Guess song..."
                 />
-                <div className="radio-guess-actions"><button type="submit" disabled={busy||!guess.trim()}>Guess</button><button type="button" disabled={busy} onClick={giveUp}>Give up</button></div>
+                <div className="radio-guess-actions"><button type="submit" disabled={busy||!guess.trim()}>Guess</button><button type="button" disabled={busy} onClick={giveUp}>Give up</button><button type="button" disabled={busy} onClick={()=>nextRound(true)}>Skip →</button></div>
               </form>
           </>
         ) : nameSet ? (
@@ -178,7 +178,7 @@ export default function GuessGame({ onScoreSaved }) {
             {status === 'correct' && <span className="radio-result-time">Guessed in {(lastTimeMs / 1000).toFixed(1)}s</span>}
             <div className="radio-reveal-actions">
               <button aria-expanded={fullSongId === song.youtubeId} aria-controls="revealed-song-player" onClick={() => { playerRef.current?.stop(); setFullSongId(fullSongId === song.youtubeId ? null : song.youtubeId) }}>{fullSongId === song.youtubeId ? 'Stop song' : '▶ Play song'}</button>
-              <button disabled={busy} onClick={nextRound}>Next song ▶</button>
+              <button disabled={busy} onClick={()=>nextRound()}>Next song ▶</button>
             </div>
           </div>
         ) : null}

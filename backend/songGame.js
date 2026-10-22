@@ -22,7 +22,7 @@ router.post('/queue',async(req,res)=>{
 router.post('/:token/:action',async(req,res)=>{
  const r=rounds.get(req.params.token),action=req.params.action
  if(!r||r.expires<Date.now())return res.status(410).json({error:'This round expired. Start another song.'})
- if(!['play','guess','reveal'].includes(action))return res.sendStatus(404)
+ if(!['play','guess','reveal','skip'].includes(action))return res.sendStatus(404)
  if(r.status==='settling')return res.status(409).json({error:'Answer is being saved. Please wait.'})
  if(r.status!=='active')return res.json(view(r))
  if(action==='play'){
@@ -30,6 +30,7 @@ router.post('/:token/:action',async(req,res)=>{
   r.started??=Date.now();r.weight=Math.min(r.weight,weight)
   return res.json({...view(r),seconds:durations[weight]})
  }
+ if(action==='skip'){r.status='skipped';return res.json({id:r.token,status:r.status,points:0})}
  const guess=req.body.guess
  if(action==='guess'&&(typeof guess!=='string'||!guess.trim()||guess.length>255))return res.status(400).json({error:'Enter a song name.'})
  if(action==='guess'&&!r.started)return res.status(400).json({error:'Play the clip before guessing.'})

@@ -108,7 +108,7 @@ router.post('/rooms/:code/action',wrap(async(req,res)=>{
   expireAnswer(r)
   if(!req.isBuzzerHost)fail('Host only.',403)
   if(req.body.version!==r.version)fail('Room changed. Try again.')
-  if(!['closed','settled'].includes(r.phase))fail('Close buzzing first.')
+  if(r.phase==='lobby')fail('Start the game first.')
   next(r);r.version++
  }else action(r,req.isBuzzerHost,req.player,req.body)
  res.json(view(r,req.isBuzzerHost,req.player))

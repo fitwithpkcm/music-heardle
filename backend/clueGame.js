@@ -27,8 +27,9 @@ router.post('/:token/:action', (req,res) => {
   const round=rounds.get(req.params.token)
   if(!round||round.expires<Date.now()) return res.status(410).json({error:'This round expired. Start a new movie.'})
   const action=req.params.action
-  if(!['next','guess','reveal'].includes(action)) return res.status(404).json({error:'Unknown action.'})
+  if(!['next','guess','reveal','skip'].includes(action)) return res.status(404).json({error:'Unknown action.'})
   if(round.status!=='active') return res.json(snapshot(round))
+  if(action==='skip'){round.status='skipped';return res.json({token:round.token,status:'skipped',points:0})}
   if(action==='next') round.count=Math.min(5,round.count+1)
   if(action==='reveal') {
     if(round.count<5) return res.status(400).json({error:'Open all five clues before revealing the movie.'})

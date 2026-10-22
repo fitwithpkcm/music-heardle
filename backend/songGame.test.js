@@ -25,5 +25,7 @@ test('opaque song rounds, single-use answers and server-authoritative scoring',a
   const {data:[second]}=await post('/queue');await post(`/${second.id}/reveal`);assert.equal((await post(`/${second.id}/guess`,{guess:'Secret Song',playerName:'Tester'})).data.points,0);assert.equal(writes,1)
   const {data:[third]}=await post('/queue');await post(`/${third.id}/play`,{weight:5});const wrong=await post(`/${third.id}/guess`,{guess:'Wrong'});assert.equal(wrong.data.status,'wrong');assert.equal(wrong.data.title,'Secret Song')
   assert.equal((await post('/queue',{afterYear:123})).status,400)
+  const {data:[skip]}=await post('/queue');const skipped=await post(`/${skip.id}/skip`);assert.equal(skipped.data.status,'skipped');assert.equal(skipped.data.title,undefined)
+  assert.equal((await post(`/${skip.id}/guess`,{guess:'Secret Song',playerName:'Tester'})).data.points,0);assert.equal(writes,1)
  }finally{pool.query=original;await new Promise(r=>server.close(r));await pool.end()}
 })
