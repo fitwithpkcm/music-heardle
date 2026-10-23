@@ -22,14 +22,17 @@ function CinemaHome() {
           <div className="showing-heading"><h2 id="showing-title">Now showing</h2><span>ONE TICKET. ENDLESS NOSTALGIA.</span></div>
           <div className="cinema-game-grid">
             {[
-              { id: 'song', title: 'Guess the Song', hint: 'Listen. Name the tune.', symbol: '♫' },
-              { id: 'picture', title: 'Picture Clues', hint: 'One picture. One movie.', symbol: '▣' },
+              { id: 'song', title: 'Guess the Song', hint: 'Listen. Name the tune.', image: '/art/radio-card.png' },
+              { id: 'picture', title: 'Picture Clues', hint: 'One picture. One movie.', image: '/art/theatre-card-red-wide.png' },
               { id: 'dialogue', title: 'Guess the Movie', hint: 'Know that dialogue?', symbol: '“' },
               { id: 'clue', title: 'Five Clues', hint: 'Fewer clues. More points.', symbol: '05' },
               { id: 'lyrics', title: 'Missing Lyrics', hint: 'Fill in the missing words.', symbol: '♪' },
             ].map((game, index) => (
-              <a className={'cinema-game-tile cinema-game-tile-' + game.id} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
-                <div className="game-tile-top"><span>GAME 0{index + 1}</span><span className="game-tile-symbol" aria-hidden="true">{game.symbol}</span></div>
+              <a className={'cinema-game-tile cinema-game-tile-' + game.id + (game.image ? ' game-tile-illustrated' : '')} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+                {game.image && <div className="game-tile-artwork" aria-hidden="true">
+                  <img className="game-tile-art" src={game.image} alt="" />
+                </div>}
+                <div className="game-tile-top"><span>GAME 0{index + 1}</span>{!game.image && <span className="game-tile-symbol" aria-hidden="true">{game.symbol}</span>}</div>
                 <div className="game-tile-copy"><h3>{game.title}</h3><p>{game.hint}</p></div>
                 <span className="game-tile-play">Let’s play <span aria-hidden="true">↗</span></span>
               </a>
