@@ -25,7 +25,7 @@ export default function LyricsGame(){
  function leave(){revision.current++;setSession(null);setRoom(null);setError('');clearFeedback()}
  const words=room?.sections.flat().filter(w=>w.id!==undefined)||[]
  return <main className="cinema-home lyrics-page"><div className="dialogue-shell">
- <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
+ <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 05</span></header>
  <div className="dialogue-heading"><p className="cinema-eyebrow">THE MISSING LYRICS</p><h1>Know the words?<br/><em>Fill the silence.</em></h1><p>Full lyrics · Blanks in two sections · 10 points per word</p></div>
  <GameModes game="lyrics" />
  {!session?<section className="lyrics-setup"><div className="clue-case"><h2>Play together</h2><p>One host, spoken answers. The first team to answer correctly wins the word; the other team is locked out.</p><button disabled={busy} onClick={()=>enter('host')}>Start host mode</button></div><div className="clue-case"><h2>Play online</h2><p>Two teams, identical blanks. Each team submits its own answers and reveals only its own words. Teammates share attempts and scores.</p><button disabled={busy} onClick={()=>enter('online')}>Create online room</button><form onSubmit={e=>{e.preventDefault();enter('join')}}><label htmlFor="room-code">Join a room</label><input id="room-code" value={code} maxLength={6} required pattern="[a-fA-F0-9]{6}" placeholder="Room code" onChange={e=>setCode(e.target.value)}/><select aria-label="Choose team" value={joinTeam} onChange={e=>setJoinTeam(Number(e.target.value))}><option value={1}>Team B</option><option value={0}>Team A</option></select><button disabled={busy}>Join</button></form></div></section>:room?<>

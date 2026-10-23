@@ -1,6 +1,8 @@
+import './RadioWood.css'
+
 export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolumeChange, children, tunerContent, yearTuner, feedback, roundId }) {
   return (
-    <section className="radio" aria-label="Radio playback controls">
+    <section className="radio wood-radio" aria-label="Radio playback controls">
       {(feedback === 'correct' || feedback === 'wrong') && (
         <div key={`${roundId}-${feedback}`} className={`radio-feedback radio-feedback-${feedback}`} aria-hidden="true">
           {feedback === 'correct' && Array.from({ length: 32 }, (_, index) => (
@@ -17,7 +19,7 @@ export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolu
       )}
       <div className="radio-grille">
         <div className="radio-speaker" />
-        <span className="radio-brand">Malayalam<span>MELODY CLUB</span></span>
+        <span className="radio-brand">Padam<span>MELODY CLUB</span></span>
         {yearTuner}
         {children}
       </div>
@@ -33,7 +35,7 @@ export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolu
         </div>}
         <label className="radio-control radio-volume">
           <div className="radio-knob" aria-hidden="true" style={{ transform: `rotate(${volume * 2.7 - 135}deg)` }}><b /></div>
-          <input type="range" min="0" max="100" value={volume} onChange={(e) => onVolumeChange(Number(e.target.value))} aria-label="Volume" />
+          <input type="range" min="0" max="100" value={volume} style={{ '--volume-level': `${volume}%` }} onChange={(e) => onVolumeChange(Number(e.target.value))} aria-label="Volume" />
           <span>VOL · {volume}%</span>
         </label>
       </div>

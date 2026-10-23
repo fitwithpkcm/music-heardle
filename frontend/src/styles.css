@@ -530,3 +530,9 @@ input, select { color: #44392e; background: #faf7f0; border: 1px solid #dfd4c5; 
   .radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 10px; }
   .radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 9px; }
 }
+.radio-round-result:has(.radio-answer-thumbnail) > .radio-reveal-actions { grid-column:1 / -1; }
+.radio-reveal-actions { display:flex;width:100%;gap:5px; }
+.radio-reveal-actions button { flex:1;min-width:0;padding-inline:5px;white-space:nowrap; }
+.revealed-song-player h2 { margin:0;font-size:20px; }
+.revealed-song-player p { font-size:14px; }
+.revealed-song-player iframe { display:block;width:100%;aspect-ratio:16/9;min-height:200px;border:0;border-radius:8px; }

@@ -1,19 +1,8 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const BASE = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:4000`
 
-export async function fetchSongs(signal) {
-  const res = await fetch(`${BASE}/songs`, { signal, cache: 'no-store' })
-  if (!res.ok) throw new Error('Failed to load songs')
-  return res.json()
-}
-
-export async function submitScore({ playerName, level, timeMs }) {
-  const res = await fetch(`${BASE}/scores`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerName, level, timeMs }),
-  })
-  if (!res.ok) throw new Error('Failed to submit score')
-  return res.json()
+export async function songRequest(path, body={}, signal) {
+ const res=await fetch(BASE+'/song-game/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal,cache:'no-store'});
+ const data=await res.json();if(!res.ok)throw new Error(data.error||'Song request failed');return data
 }
 
 export async function fetchLeaderboard(level) {
@@ -45,4 +34,12 @@ export async function clueGameRequest(action, body = {}, signal) {
   const data = await response.json()
   if (!response.ok) { const error = new Error(data.error || 'Please try again.'); error.expired = response.status === 410; throw error }
   return data
+}
+
+export async function fetchPictures(signal) {
+ const r=await fetch(BASE+'/picture-game',{signal});if(!r.ok)throw Error('Could not load picture clues.');return r.json()
+}
+export async function guessPicture(id,guess,reveal=false) {
+ const r=await fetch(BASE+'/picture-game/'+id+'/guess',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({guess,reveal})})
+ const data=await r.json();if(!r.ok)throw Error(data.error||'Could not check answer.');return data
 }

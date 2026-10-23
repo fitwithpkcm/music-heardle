@@ -3,7 +3,7 @@ import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto'
 import {pool} from './db.js'
 const router=express.Router(), sessions=new Map(), attempts=new Map()
 const username=process.env.ADMIN_USERNAME||'admin', passwordHash=scryptSync(process.env.ADMIN_PASSWORD||'admin','padam-admin',32)
-const definitions={songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','aliases','source_url']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
+const definitions={pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','aliases','source_url']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
 const parse=value=>typeof value==='string'?JSON.parse(value):value
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.post('/login',(req,res)=>{
@@ -19,7 +19,7 @@ router.post('/logout',(req,res)=>{sessions.delete(req.adminToken);res.json({ok:t
 router.get('/session',(req,res)=>res.json({username}))
 function validate(kind,input){
  const d=definitions[kind],out={}
- for(const field of d.fields){const value=input[field]
+ for(const field of d.fields){const value=field==='mobile_image_url'?(input[field]||''):input[field]
   if(['aliases','clues','sections'].includes(field)){
    if(!Array.isArray(value)||value.length>100||value.some(s=>typeof s!=='string'||!s.trim()||s.length>20000))throw Error(`${field}: enter a valid list of text values.`)
    if(field==='clues'&&value.length!==5)throw Error('Exactly five clues are required.')
@@ -31,10 +31,12 @@ function validate(kind,input){
    }
    out[field]=JSON.stringify(value.map(s=>s.trim()))
   }else if(field==='release_year'){if(value!==null&&(!Number.isInteger(value)||value<1900||value>2100))throw Error('Release year must be 1900–2100 or blank.');out[field]=value}
-  else{if(typeof value!=='string'||(field!=='source_url'&&!value.trim())||value.length>(field==='dialogue'?10000:field==='source_url'?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
+  else{if(typeof value!=='string'||(!['source_url','mobile_image_url'].includes(field)&&!value.trim())||value.length>(field==='dialogue'?10000:['source_url','image_url','mobile_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
  }
  if(kind==='songs'&&!/^[A-Za-z0-9_-]{11}$/.test(out.youtube_id))throw Error('YouTube ID must contain 11 characters.')
  if(out.source_url&&!/^https?:\/\//i.test(out.source_url))throw Error('Source URL must begin with https:// or http://.')
+ if(out.mobile_image_url&&!/^(https?:\/\/|\/picture-clues\/)/i.test(out.mobile_image_url))throw Error('Use an image URL or /picture-clues/ path.')
+ if(out.image_url&&!/^(https?:\/\/|\/picture-clues\/)/i.test(out.image_url))throw Error('Use an HTTPS image URL or /picture-clues/ path.')
  return out
 }
 router.use('/:kind',(req,res,next)=>{if(!Object.hasOwn(definitions,req.params.kind))return res.status(404).json({error:'Unknown catalog.'});const d=definitions[req.params.kind];req.definition=d;req.kind=req.params.kind;next()})

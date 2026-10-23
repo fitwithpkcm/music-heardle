@@ -1,3 +1,4 @@
+import PictureGame from './components/PictureGame'
 import GameModes from './components/GameModes'
 import BuzzerGame from './components/BuzzerGame'
 import Admin from './components/Admin'
@@ -17,56 +18,23 @@ function CinemaHome() {
           <a className="cinema-logo" href="#"><span aria-hidden="true">✦</span> PADAM<span className="logo-caption">THE FILM PLAYHOUSE</span></a>
           <span className="cinema-header-note">Made for the love of Malayalam cinema.</span>
         </header>
-        <section className="cinema-hero" aria-labelledby="cinema-title">
-          <p className="cinema-eyebrow"><span /> THE SHOW IS ABOUT TO BEGIN</p>
-          <h1 id="cinema-title">You know the films.<br />Now, <em>play the part.</em></h1>
-          <p className="cinema-intro">The songs you hum. The stories you love.<br />A little movie magic, one game at a time.</p>
-          <a className="cinema-explore" href="#now-showing">Find your next game <span aria-hidden="true">↓</span></a>
-          <div className="cinema-reel" aria-hidden="true"><i /><i /><i /><i /><b /></div>
-          <span className="hero-edition">MALAYALAM CINEMA / VOL. 01</span>
-        </section>
         <section className="cinema-games" id="now-showing" aria-labelledby="showing-title">
           <div className="showing-heading"><h2 id="showing-title">Now showing</h2><span>ONE TICKET. ENDLESS NOSTALGIA.</span></div>
-          <a className="featured-game" href="#song-game" aria-label="Play Guess the Song">
-            <div className="game-poster">
-              <span className="poster-topline">A MALAYALAM MUSIC EXPERIENCE</span>
-              <div className="poster-disc" aria-hidden="true"><div><span>PADAM</span><b>♫</b><small>SIDE A · 33 RPM</small></div></div>
-              <div className="poster-title">FOR THE<br /><em>record.</em></div>
-              <span className="poster-bottomline">A FEW SECONDS. A THOUSAND MEMORIES.</span>
-            </div>
-            <div className="game-ticket">
-              <div className="ticket-meta"><span className="live-badge">● NOW PLAYING</span><span>GAME 01</span></div>
-              <p className="ticket-category">THE MUSIC ROUND</p>
-              <h3>Guess the Song</h3>
-              <p className="ticket-description">That opening note sounds familiar. Tune in to the vintage radio and name the Malayalam song before the moment slips away.</p>
-              <div className="game-features"><span>5 difficulty levels</span><span>264 songs</span><span>Leaderboard</span></div>
-              <span className="ticket-play">Let’s play <span aria-hidden="true">↗</span></span>
-              <span className="ticket-admission">ADMIT ONE MUSIC LOVER <span className="ticket-barcode" aria-hidden="true" /></span>
-            </div>
-          </a>
-          {[
-            { id: 'lyrics', number: '04', title: 'Missing Lyrics', category: 'THE LYRICS ROUND', topline: 'A MALAYALAM LYRICS CHALLENGE', headline: 'FILL THE SILENCE.', subtitle: 'Know the words.', symbol: '♫', description: 'Two lyric sections, a few missing words. Play aloud with a host or compete in a shared room with another team.', features: ['10 points per word', 'Host mode', 'Online teams'], footer: 'SAME WORDS. TWO TEAMS.' },
-            { id: 'dialogue', number: '02', title: 'Guess the Movie', category: 'THE DIALOGUE ROUND', topline: 'A MALAYALAM DIALOGUE EXPERIENCE', headline: 'FAMOUS LINES.', subtitle: 'Unforgettable films.', symbol: '“', description: 'One familiar dialogue. Which Malayalam film comes to mind? Read the script and name the movie behind the words.', features: ['Iconic dialogues', 'Type your answer', 'Spelling friendly'], footer: 'ONE LINE. A THOUSAND MEMORIES.' },
-            { id: 'clue', number: '03', title: 'Five Clues', category: 'THE MOVIE MYSTERY', topline: 'A MALAYALAM MOVIE MYSTERY', headline: 'FOLLOW THE CLUES.', subtitle: 'Name the film.', symbol: '05', description: 'One movie, five hints. Solve it early for more points, or reveal the answer after clue five.', features: ['5 clues', '100 points to win', 'Optional timer'], footer: 'FIVE CLUES. ONE GREAT REVEAL.' },
-          ].sort((a,b) => a.number.localeCompare(b.number)).map(game => (
-            <a className={`featured-game featured-game-${game.id}`} href={`#${game.id}-game`} aria-label={`Play ${game.title}`} key={game.id}>
-              <div className="game-poster">
-                <span className="poster-topline">{game.topline}</span>
-                <div className="poster-game-symbol" aria-hidden="true">{game.symbol}</div>
-                <div className="poster-title">{game.headline}<br /><em>{game.subtitle}</em></div>
-                <span className="poster-bottomline">{game.footer}</span>
-              </div>
-              <div className="game-ticket">
-                <div className="ticket-meta"><span className="live-badge">● NOW PLAYING</span><span>GAME {game.number}</span></div>
-                <p className="ticket-category">{game.category}</p>
-                <h3>{game.title}</h3>
-                <p className="ticket-description">{game.description}</p>
-                <div className="game-features">{game.features.map(feature => <span key={feature}>{feature}</span>)}</div>
-                <span className="ticket-play">Let’s play <span aria-hidden="true">↗</span></span>
-                <span className="ticket-admission">ADMIT ONE FILM LOVER <span className="ticket-barcode" aria-hidden="true" /></span>
-              </div>
-            </a>
-          ))}
+          <div className="cinema-game-grid">
+            {[
+              { id: 'song', title: 'Guess the Song', hint: 'Listen. Name the tune.', symbol: '♫' },
+              { id: 'picture', title: 'Picture Clues', hint: 'One picture. One movie.', symbol: '▣' },
+              { id: 'dialogue', title: 'Guess the Movie', hint: 'Know that dialogue?', symbol: '“' },
+              { id: 'clue', title: 'Five Clues', hint: 'Fewer clues. More points.', symbol: '05' },
+              { id: 'lyrics', title: 'Missing Lyrics', hint: 'Fill in the missing words.', symbol: '♪' },
+            ].map((game, index) => (
+              <a className={'cinema-game-tile cinema-game-tile-' + game.id} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+                <div className="game-tile-top"><span>GAME 0{index + 1}</span><span className="game-tile-symbol" aria-hidden="true">{game.symbol}</span></div>
+                <div className="game-tile-copy"><h3>{game.title}</h3><p>{game.hint}</p></div>
+                <span className="game-tile-play">Let’s play <span aria-hidden="true">↗</span></span>
+              </a>
+            ))}
+          </div>
 
           <div className="coming-attractions"><span aria-hidden="true">✧</span><div><h3>More stories. More games.</h3><p>The next attraction is still in the making. Enjoy the music while you wait.</p></div><span className="coming-label">COMING SOON</span></div>
         </section>
@@ -78,17 +46,22 @@ function CinemaHome() {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
   const [scoreVersion, setScoreVersion] = useState(0)
   useEffect(() => {
+    let previousHash = window.location.hash
+    const gameFor = hash => hash.startsWith('#buzzer-game') ? new URLSearchParams(hash.split('?')[1]).get('game') : ({'#picture-game':'pictures','#song-game':'song','#dialogue-game':'dialogue','#clue-game':'clues','#lyrics-game':'lyrics'})[hash]
     const updatePage = () => {
-      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
-      if (window.location.hash !== '#now-showing') window.scrollTo(0, 0)
+      const sameGame = gameFor(previousHash) && gameFor(previousHash) === gameFor(window.location.hash)
+      previousHash = window.location.hash
+      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+      if (!sameGame && window.location.hash !== '#now-showing') window.scrollTo(0, 0)
     }
     window.addEventListener('hashchange', updatePage)
     return () => window.removeEventListener('hashchange', updatePage)
   }, [])
   if (page === 'buzzer') return <BuzzerGame />
+  if (page === 'pictures') return <PictureGame />
   if (page === 'admin') return <Admin />
   if (page === 'lyrics') return <LyricsGame />
   if (page === 'clue') return <ClueGame />
@@ -98,11 +71,6 @@ export default function App() {
     <main className="app">
       <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
 
-      <header className="masthead">
-        <p className="eyebrow">THE MALAYALAM MUSIC CLUB</p>
-        <h1>A little nostalgia.<br /><em>A familiar tune.</em></h1>
-        <p>Listen to a little. Remember it all.</p>
-      </header>
       <GameModes game="song" />
       <GuessGame onScoreSaved={() => setScoreVersion((value) => value + 1)} />
       <Leaderboard refreshKey={scoreVersion} />
