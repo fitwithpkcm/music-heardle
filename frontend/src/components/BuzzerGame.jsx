@@ -10,9 +10,9 @@ export default function BuzzerGame(){
  const game=Object.hasOwn(games,params.get('game'))?params.get('game'):'buzzer'
  const [setupOpen,setSetupOpen]=useState(true),[setupTab,setSetupTab]=useState(params.get('room')?'join':'host'),[lobbyOpen,setLobbyOpen]=useState(true)
  const dialogRef=useRef(null),lobbyDialogRef=useRef(null),previousPhase=useRef(null)
- useEffect(()=>{const d=dialogRef.current;if(!d)return;if(!session&&setupOpen&&!d.open)d.showModal();else if(d.open)d.close()},[session,setupOpen])
+ useEffect(()=>{const d=dialogRef.current;if(!d)return;if(!session&&setupOpen&&!d.open){const y=window.scrollY;d.showModal();window.scrollTo(0,y)}else if(d.open)d.close()},[session,setupOpen])
  useEffect(()=>{if(previousPhase.current==='lobby'&&room?.phase&&room.phase!=='lobby')setLobbyOpen(false);previousPhase.current=room?.phase},[room?.phase])
- useEffect(()=>{const d=lobbyDialogRef.current;if(!d)return;if(lobbyOpen&&!d.open)d.showModal();else if(!lobbyOpen&&d.open)d.close()},[room?.code,lobbyOpen])
+ useEffect(()=>{const d=lobbyDialogRef.current;if(!d)return;if(lobbyOpen&&!d.open){const y=window.scrollY;d.showModal();window.scrollTo(0,y)}else if(!lobbyOpen&&d.open)d.close()},[room?.code,lobbyOpen])
  const names=Array.from({length:teamCount},(_,i)=>`Team ${String.fromCharCode(65+i)}`)
  const lock=useRef(false),generation=useRef(0),offset=useRef(0)
  function receive(data){offset.current=data.serverNow-Date.now();setRoom(data)}
@@ -31,11 +31,12 @@ export default function BuzzerGame(){
 
  const selected=room?.game||game
  const titles={pictures:<>One picture.<br/><em>Which movie?</em></>,lyrics:<>Know the words?<br/><em>Fill the silence.</em></>,dialogue:<>One line.<br/><em>A whole movie.</em></>,clues:<>Five clues.<br/><em>One movie.</em></>}
+ const heading={"pictures":["02","THE PICTURE CLUE","Look closely. Name the film."],"dialogue":["02","THE DIALOGUE ROUND","You remember the dialogue. Can you name the film?"],"clues":["03","THE FIVE-CLUE MYSTERY","The sooner it clicks, the more points you earn."],"lyrics":["04","THE MISSING LYRICS","Full lyrics · Blanks in two sections · 10 points per word"]}[selected]
  const phase=room?.phase
  const status=phase==='open'?'Buzzers open!':phase==='answering'?room.teams[room.winner.team].name+' buzzed first!':phase==='settled'?'Round settled':allBlocked?'All teams have tried.':'Buzzers closed'
- return <main className={selected==='song'?'app buzzer-page buzzer-integrated':(selected==='pictures'?'cinema-home picture-page buzzer-page buzzer-integrated ':'cinema-home lyrics-page buzzer-page buzzer-integrated ')+(selected==='dialogue'?'dialogue-page':selected==='clues'?'clue-page':'')}><div className="dialogue-shell">
- {selected==='song'?<a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>:<header className="dialogue-nav"><a href="#">← All games</a><span>{games[selected]} · Buzzer</span></header>}
- {selected!=='song'&&<div className="dialogue-heading"><p className="cinema-eyebrow">{games[selected]}</p><h1>{titles[selected]||'First to buzz.'}</h1></div>}
+ return <main className={selected==='song'?'app buzzer-page buzzer-integrated':'cinema-home buzzer-page buzzer-integrated '+(selected==='pictures'?'picture-page':selected==='dialogue'?'dialogue-page':selected==='clues'?'clue-page':'lyrics-page')}><div className="dialogue-shell">
+ {selected==='song'?<a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>:<header className="dialogue-nav"><a href="#">← All games</a><span>{heading?`PADAM / GAME ${heading[0]}`:games[selected]}</span></header>}
+ {selected!=='song'&&<div className="dialogue-heading"><p className="cinema-eyebrow">{heading?.[1]||games[selected]}</p><h1>{titles[selected]||'First to buzz.'}</h1>{heading&&<p>{heading[2]}</p>}</div>}
  {(!room||room.host)&&selected!=='buzzer'&&<GameModes game={selected} buzzer />}
  {!session&&<>
  <BuzzerStage game={selected}/>
@@ -53,7 +54,7 @@ export default function BuzzerGame(){
  
  <dialog className="buzzer-setup-dialog buzzer-room-dialog" ref={lobbyDialogRef} aria-labelledby="buzzer-room-title" onCancel={()=>setLobbyOpen(false)} onClose={()=>setLobbyOpen(false)}>
  <div className="buzzer-dialog-heading"><h2 id="buzzer-room-title">Teams & invitations</h2><button aria-label="Close room details" onClick={()=>setLobbyOpen(false)}>×</button></div>
- <div className="lyrics-room-bar"><span>Room <strong>{room.code}</strong> · Round {room.round}</span><button disabled={busy} onClick={leave}>Leave</button></div>
+ <div className="lyrics-room-bar"><span>Room <strong>{room.code}</strong> · Round {room.round}</span><button disabled={busy} onClick={leave}>← Back</button></div>
  <div className="buzzer-scores compact-team-scores">{room.teams.map((t,i)=><div key={i} className={room.winner?.team===i?'winning':''}><strong>{t.name}</strong><span>{t.score} pts</span>{room.blocked.includes(i)&&<small>Locked out</small>}</div>)}</div>
  <section className="buzzer-lobby"><p>{room.players.length} players · {phase==='lobby'?'Waiting to start':'In progress'}</p>
  {room.host&&phase==='lobby'&&<><p>Share a team link, or assign players who join with the room code. Use this computer’s network address for phone access.</p><button onClick={()=>copy(link())}>Copy room link</button><input aria-label="Room join link" readOnly value={link()}/>{room.teams.map(t=><div key={t.invite}><button onClick={()=>copy(link(t.invite))}>Copy {t.name} invitation</button><input aria-label={t.name+' invitation'} readOnly value={link(t.invite)}/></div>)}<p role="status">{copied}</p></>}

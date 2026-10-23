@@ -35,7 +35,7 @@ export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolu
         </div>}
         <label className="radio-control radio-volume">
           <div className="radio-knob" aria-hidden="true" style={{ transform: `rotate(${volume * 2.7 - 135}deg)` }}><b /></div>
-          <input type="range" min="0" max="100" value={volume} onChange={(e) => onVolumeChange(Number(e.target.value))} aria-label="Volume" />
+          <input type="range" min="0" max="100" value={volume} style={{ '--volume-level': `${volume}%` }} onChange={(e) => onVolumeChange(Number(e.target.value))} aria-label="Volume" />
           <span>VOL · {volume}%</span>
         </label>
       </div>
