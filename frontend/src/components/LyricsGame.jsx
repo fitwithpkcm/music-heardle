@@ -2,6 +2,7 @@ import LyricsStudio from './LyricsStudio'
 import GameModes from './GameModes'
 import {useEffect,useRef,useState} from 'react'
 import RoundFeedback,{useRoundFeedback} from './RoundFeedback'
+import './LyricsKaraoke.css'
 const BASE=import.meta.env.VITE_API_URL||`${window.location.protocol}//${window.location.hostname}:4000`
 export default function LyricsGame(){
  const [session,setSession]=useState(()=>{try{return JSON.parse(sessionStorage.getItem('lyrics-room'))}catch{return null}})
@@ -28,7 +29,7 @@ export default function LyricsGame(){
  async function act(action,extra={}){if(lock.current)return;lock.current=true;revision.current++;setBusy(true);setError('');try{const data=await request(`rooms/${room.code}/action`,{action,round:room.round,...extra});setRoom(data);if(action==='guess')showFeedback(data.answers[extra.id].correct?'correct':'wrong');if(action==='mark')showFeedback(extra.correct?'correct':'wrong')}catch(e){setError(e.message)}finally{lock.current=false;setBusy(false)}}
  function leave(){revision.current++;setSession(null);setRoom(null);setSetupOpen(true);setError('');clearFeedback()}
  const words=room?.sections.flat().filter(w=>w.id!==undefined)||[]
- return <main className="cinema-home lyrics-page"><div className="dialogue-shell">
+ return <main className="cinema-home lyrics-page karaoke-theme"><div className="dialogue-shell">
  <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 05</span></header>
  <div className="dialogue-heading"><p className="cinema-eyebrow">THE MISSING LYRICS</p><h1>Missing Lyrics</h1><p>Complete the song. Bring the scene back.</p></div>
  <GameModes game="lyrics" />
