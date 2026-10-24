@@ -1,3 +1,6 @@
+import FilmClues from './components/FilmClues'
+import LyricsStudio from './components/LyricsStudio'
+import Clapperboard from './components/Clapperboard'
 import PictureGame from './components/PictureGame'
 import GameModes from './components/GameModes'
 import BuzzerGame from './components/BuzzerGame'
@@ -24,15 +27,18 @@ function CinemaHome() {
             {[
               { id: 'song', title: 'Guess the Song', hint: 'Listen. Name the tune.', image: '/art/radio-card.png' },
               { id: 'picture', title: 'Picture Clues', hint: 'One picture. One movie.', image: '/art/theatre-card-red-wide.png' },
-              { id: 'dialogue', title: 'Guess the Movie', hint: 'Know that dialogue?', symbol: '“' },
-              { id: 'clue', title: 'Five Clues', hint: 'Fewer clues. More points.', symbol: '05' },
-              { id: 'lyrics', title: 'Missing Lyrics', hint: 'Fill in the missing words.', symbol: '♪' },
+              { id: 'dialogue', title: 'Guess the Movie', hint: 'Know that dialogue?', clapper: true },
+              { id: 'clue', title: 'Five Clues', hint: 'Fewer clues. More points.', film: true },
+              { id: 'lyrics', title: 'Missing Lyrics', hint: 'Fill in the missing words.', studio: true },
             ].map((game, index) => (
-              <a className={'cinema-game-tile cinema-game-tile-' + game.id + (game.image ? ' game-tile-illustrated' : '')} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+              <a className={'cinema-game-tile cinema-game-tile-' + game.id + (game.image || game.clapper || game.studio || game.film ? ' game-tile-illustrated' : '')} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+                {game.film && <div className="game-tile-artwork game-tile-film-art" aria-hidden="true"><FilmClues compact clues={[true,true]}/></div>}
+                {game.studio && <div className="game-tile-artwork game-tile-studio-art" aria-hidden="true"><LyricsStudio compact><div className="studio-mini-notation">♪ ♫ ♩ ♫</div><p className="studio-mini-words"><span>____ ♪ ____</span><span>♫ ____ ____</span><span>____ ____ ♩</span></p></LyricsStudio></div>}
+                {game.clapper && <div className="game-tile-artwork game-tile-clapper-art" aria-hidden="true"><Clapperboard compact animate={false}>Famous lines.</Clapperboard></div>}
                 {game.image && <div className="game-tile-artwork" aria-hidden="true">
                   <img className="game-tile-art" src={game.image} alt="" />
                 </div>}
-                <div className="game-tile-top"><span>GAME 0{index + 1}</span>{!game.image && <span className="game-tile-symbol" aria-hidden="true">{game.symbol}</span>}</div>
+                <div className="game-tile-top"><span>GAME 0{index + 1}</span>{!game.image && !game.clapper && !game.studio && !game.film && <span className="game-tile-symbol" aria-hidden="true">{game.symbol}</span>}</div>
                 <div className="game-tile-copy"><h3>{game.title}</h3><p>{game.hint}</p></div>
                 <span className="game-tile-play">Let’s play <span aria-hidden="true">↗</span></span>
               </a>
@@ -80,4 +86,3 @@ export default function App() {
     </main>
   )
 }
-
