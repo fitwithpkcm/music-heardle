@@ -1,5 +1,5 @@
-import contributions from './contributions.js'
 import {expandDialogues} from './dialogueVariants.js'
+import contributions from './contributions.js'
 import {uploadDirectory} from './pictureUploads.js'
 import pictureGame from './pictureGame.js'
 import songGame from './songGame.js'
@@ -43,7 +43,7 @@ app.get('/movies', (req,res) => res.status(410).json({error:'Public catalog disa
 app.get('/dialogues', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT id, dialogue, dialogue_english, dialogue_variants FROM dialogues ORDER BY id')
-    res.set('Cache-Control', 'no-store').json(expandDialogues(rows).map(({id,dialogue,dialogue_english})=>({id,dialogue,dialogue_english})))
+    res.set('Cache-Control', 'no-store').json(expandDialogues(rows).map(({id,dialogue,dialogue_english,dialogue_lines})=>({id,dialogue,dialogue_english,...(dialogue_lines?{dialogue_lines}:{})})))
   } catch (error) {
     console.error('Dialogue catalog:', error.message)
     res.status(503).json({ error: 'Could not load dialogue clues.' })
@@ -79,11 +79,6 @@ app.get('/leaderboard', async (req, res) => {
   )
   res.json(rows)
 })
-
-app.get('/health', async (req, res) => {
-    res.json({ ok: true })
-});
-
 
 const port = process.env.PORT || 4000
 app.listen(port, () => console.log(`Leaderboard API on :${port}`))
